@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 28c1dc3ac1c84b229efac25809bee5af, type: 3}
   m_Name: PlayerPhysicsSettings
   m_EditorClassIdentifier: 
-  speed: 22
+  speed: 26
   rotationSpeed: 720
   accelerationCurve:
     serializedVersion: 2
@@ -20,15 +20,15 @@ MonoBehaviour:
     - serializedVersion: 3
       time: 0
       value: 0
-      inSlope: 2.649147
-      outSlope: 2.649147
+      inSlope: 6.64686
+      outSlope: 6.64686
       tangentMode: 0
       weightedMode: 0
       inWeight: 0
-      outWeight: 0.034510434
+      outWeight: 0.080275364
     - serializedVersion: 3
-      time: 0.5233791
-      value: 1.0496485
+      time: 0.1999538
+      value: 1.0431788
       inSlope: 0.6864475
       outSlope: 0.6864475
       tangentMode: 0

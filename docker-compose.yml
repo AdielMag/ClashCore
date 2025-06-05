@@ -1,0 +1,76 @@
+version: "3.8"
+
+x-cert-generation: &generate-cert
+  image: mcr.microsoft.com/dotnet/sdk:7.0
+  volumes:
+    - "./https:/https"
+  working_dir: /workspace
+  entrypoint: ["/bin/sh", "-c", "mkdir -p /https && dotnet dev-certs https -ep /https/aspnetapp.pfx -p a1234567"]
+
+services:
+  # ────────── Cert Generation ──────────
+  generate-cert:
+    <<: *generate-cert
+
+  # ────────── MongoDB ──────────
+  mongo:
+    image: mongo:7.0
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+    command: ["mongod", "--replSet", "rs0", "--bind_ip_all"]
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "try{rs.status().ok}catch(e){rs.initiate({_id:'rs0',members:[{_id:0,host:'mongo:27017'}]})}"]
+      interval: 5s
+      start_period: 10s
+
+  mongo-init:
+    image: mongo:7.0
+    depends_on:
+      mongo:
+        condition: service_healthy
+    entrypoint: ["/bin/bash", "-c", "mongosh --host mongo --eval \"db.getSiblingDB('admin').createUser({user: 'root', pwd: 'example', roles: [{ role: 'root', db: 'admin' }]})\""]
+
+  # ────────── API & background services ──────────
+  server:
+    build:
+      context: .
+      dockerfile: src/Dockerfile
+      target: services
+    ports:
+      - "5002:5002"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_LOGGING__CONSOLE__DISABLECOLORS: "true"
+      ASPNETCORE_Logging__Console__FormatterName: Simple
+      MONGO_DB_CONNECTION_STRING: mongodb://root:example@mongo:27017/solaria?authSource=admin&replicaSet=rs0
+    volumes:
+      - "./https:/https"
+    depends_on:
+      - generate-cert
+      - mongo-init
+
+  # ────────── GameHub (MagicOnion gRPC Hub) ──────────
+  gamehub:
+    build:
+      context: .
+      dockerfile: src/Dockerfile
+      target: gamehub
+    ports:
+      - "12346:12346"
+    environment:
+      MONGO_DB_CONNECTION_STRING: mongodb://root:example@mongo:27017/solaria?authSource=admin&replicaSet=rs0
+    volumes:
+      - "./https:/https"
+    depends_on:
+      - generate-cert
+      - mongo-init
+
+volumes:
+  mongo-data:
+
+networks:
+  default:
+    driver: bridge

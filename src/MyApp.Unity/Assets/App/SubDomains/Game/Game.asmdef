@@ -1,0 +1,25 @@
+{
+    "name": "Game",
+    "rootNamespace": "",
+    "references": [
+        "GUID:55f833f4e2356c54a862f283266abbf4",
+        "GUID:f51ebe6a0ceec4240a699833d6309b23",
+        "GUID:b0214a6008ed146ff8f122a6a9c2f6cc",
+        "GUID:4307f53044263cf4b835bd812fc161a4",
+        "GUID:75469ad4d38634e559750d17036d5f7c",
+        "GUID:350d0af80fb7b7947a59de66ab477547",
+        "GUID:7e5ed07879a23d544becc9645362cce1"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": true,
+    "precompiledReferences": [
+        "MagicOnion.Abstractions.dll",
+        "MagicOnion.Client.dll"
+    ],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

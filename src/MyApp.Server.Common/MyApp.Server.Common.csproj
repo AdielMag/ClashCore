@@ -1,0 +1,17 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="MagicOnion" Version="6.1.4" />
+        <PackageReference Include="MagicOnion.Abstractions" Version="6.1.4" />
+        <PackageReference Include="MongoDB.Driver" Version="3.0.0" />
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="7.0.0" />
+        <ProjectReference Include="..\MyApp.Shared\MyApp.Shared.csproj" />
+    </ItemGroup>
+    
+</Project>

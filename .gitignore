@@ -107,3 +107,4 @@ crashlytics-build.properties
 **/appsettings.Development.json
 **/appsettings.json
 src/https/aspnetapp.pfx
+https/aspnetapp.pfx

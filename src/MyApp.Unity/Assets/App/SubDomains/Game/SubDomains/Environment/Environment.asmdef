@@ -1,0 +1,9 @@
+{
+  "name": "App.Environment",
+  "references": ["App", "Game", "VContainer", "UniTask"],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "autoReferenced": true
+}
+

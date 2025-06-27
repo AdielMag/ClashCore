@@ -1,0 +1,9 @@
+{
+  "name": "GameNetworkHub",
+  "references": ["App", "Game","MyApp.Shared.Unity", "UniTask", "VContainer"],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "autoReferenced": true
+}
+

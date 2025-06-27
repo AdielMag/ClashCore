@@ -1,11 +1,6 @@
-using App.SubDomains.Game.SubDomains.CameraManager.Scripts;
-using App.SubDomains.Game.SubDomains.Environment.Scripts.Manager;
-using App.SubDomains.Game.SubDomains.Environment.Scripts.Provider;
-using App.SubDomains.Game.SubDomains.GameNetworkHub;
-using App.SubDomains.Game.SubDomains.InputManager.Scripts;
-using App.SubDomains.Game.SubDomains.PlayerController.Scripts.Controller;
-using App.SubDomains.Game.SubDomains.PlayerController.Scripts.ScriptableObjects;
-using App.SubDomains.Game.SubDomains.PlayersManager;
+using App.Scripts.Command;
+using App.Scripts.VContainerExtensions.LifeTimeScopes;
+using App.SubDomains.Game.Scripts.Command;
 using App.SubDomains.Game.SubDomains.PlayerView.Scripts.Provider;
 using App.SubDomains.Game.SubDomains.PlayerView.Scripts.View;
 
@@ -17,11 +12,10 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 
 using VContainer;
-using VContainer.Unity;
 
 namespace App.SubDomains.Game.Scripts
 {
-    public class GameLifeTimeScope : LifetimeScope
+    public class GameLifeTimeScope : PrimaryLifeTimeScope
     {
         [Space]
         [SerializeField] private PlayerView playerViewPrefab;
@@ -29,19 +23,22 @@ namespace App.SubDomains.Game.Scripts
         [SerializeField] private CinemachineVirtualCamera virtualCamera;
         [SerializeField] private CinemachineBrain cameraBrain;
         [SerializeField] private InputActionAsset inputActionAsset;
-        [SerializeField] private EnvironmentParentProvider environmentParent;
-        [SerializeField] private PlayerPhysicsSettings playerPhysicsSettings;
 
-        protected override void Configure(IContainerBuilder builder)
+        protected override void InternalConfigure(IContainerBuilder builder)
         {
             builder.Register<GameStarter>(Lifetime.Singleton).AsImplementedInterfaces();
             
-            RegisterManagers(builder);
             RegisterComponents(builder);
             RegisterSharedControllers(builder);
-            RegisterPlayerControllers(builder);
+            RegisterCommands(builder);
+            
+            builder.RegisterBuildCallback(resolver =>
+            {
+                var commandPool = resolver.Resolve<CommandPool<QuitGameCommand>>();
+                commandPool.SetPoolSize(1);
+            });
         }
-        
+
         private void RegisterComponents(IContainerBuilder builder)
         {
             builder.RegisterInstance(playerViewPrefab);
@@ -49,17 +46,6 @@ namespace App.SubDomains.Game.Scripts
             builder.RegisterInstance(virtualCamera);
             builder.RegisterInstance(cameraBrain);
             builder.RegisterInstance(inputActionAsset);
-            builder.RegisterInstance(environmentParent).AsImplementedInterfaces();
-            builder.RegisterInstance(playerPhysicsSettings);
-        }
-        
-        private void RegisterManagers(IContainerBuilder builder)
-        {
-            builder.Register<GameHubNetworkManager>(Lifetime.Singleton).AsImplementedInterfaces();
-            builder.Register<PlayersManager>(Lifetime.Singleton).AsImplementedInterfaces();
-            builder.Register<CameraManager>(Lifetime.Singleton).AsImplementedInterfaces();
-            builder.Register<InputManager>(Lifetime.Singleton).AsImplementedInterfaces();
-            builder.Register<EnvironmentManager>(Lifetime.Singleton).AsImplementedInterfaces();
         }
         
         private void RegisterSharedControllers(IContainerBuilder builder)
@@ -67,10 +53,10 @@ namespace App.SubDomains.Game.Scripts
             builder.Register<PhysicsController>(Lifetime.Transient).AsImplementedInterfaces();
         }
         
-        private void RegisterPlayerControllers(IContainerBuilder builder)
+        private void RegisterCommands(IContainerBuilder builder)
         {
-            builder.RegisterEntryPoint<LocalPlayerController>(Lifetime.Transient).AsSelf();
-            builder.RegisterEntryPoint<RemotePlayerController>(Lifetime.Transient).AsSelf();
+            builder.Register<QuitGameCommand>(Lifetime.Scoped);
+            builder.Register<CommandPool<QuitGameCommand>>(Lifetime.Singleton);
         }
     }
 }

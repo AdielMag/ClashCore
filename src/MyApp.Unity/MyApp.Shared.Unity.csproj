@@ -63,19 +63,16 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="C:\Users\Adiel\OneDrive\מסמכים\ForkRepos\ClashCore\src\MyApp.Shared\Formatters\MessagePackResolverConfig.cs" />
-    <Compile Include="C:\Users\Adiel\OneDrive\מסמכים\ForkRepos\ClashCore\src\MyApp.Shared\Formatters\PlayerFormatter.cs" />
     <Compile Include="C:\Users\Adiel\OneDrive\מסמכים\ForkRepos\ClashCore\src\MyApp.Shared\Controller\PhysicsController\Controller\PhysicsController.cs" />
     <Compile Include="C:\Users\Adiel\OneDrive\מסמכים\ForkRepos\ClashCore\src\MyApp.Shared\Hubs\IGameHubReceiver.cs" />
     <Compile Include="C:\Users\Adiel\OneDrive\מסמכים\ForkRepos\ClashCore\src\MyApp.Shared\Data\MatchConnectionInfo.cs" />
     <Compile Include="C:\Users\Adiel\OneDrive\מסמכים\ForkRepos\ClashCore\src\MyApp.Shared\Data\Curve.cs" />
-    <Compile Include="C:\Users\Adiel\OneDrive\מסמכים\ForkRepos\ClashCore\src\MyApp.Shared\Formatters\QuaternionFormatter.cs" />
     <Compile Include="C:\Users\Adiel\OneDrive\מסמכים\ForkRepos\ClashCore\src\MyApp.Shared\Services\ISampleService.cs" />
     <Compile Include="C:\Users\Adiel\OneDrive\מסמכים\ForkRepos\ClashCore\src\MyApp.Shared\Controller\PhysicsController\Interface\ITransformable.cs" />
     <Compile Include="C:\Users\Adiel\OneDrive\מסמכים\ForkRepos\ClashCore\src\MyApp.Shared\Hubs\IGameHub.cs" />
     <Compile Include="C:\Users\Adiel\OneDrive\מסמכים\ForkRepos\ClashCore\src\MyApp.Shared\Data\TransformData.cs" />
     <Compile Include="C:\Users\Adiel\OneDrive\מסמכים\ForkRepos\ClashCore\src\MyApp.Shared\Services\IPlayersService.cs" />
     <Compile Include="C:\Users\Adiel\OneDrive\מסמכים\ForkRepos\ClashCore\src\MyApp.Shared\Data\MatchType.cs" />
-    <Compile Include="C:\Users\Adiel\OneDrive\מסמכים\ForkRepos\ClashCore\src\MyApp.Shared\Formatters\Vector3Formatter.cs" />
     <Compile Include="C:\Users\Adiel\OneDrive\מסמכים\ForkRepos\ClashCore\src\MyApp.Shared\Controller\PhysicsController\Interface\IPhysicsController.cs" />
     <Compile Include="C:\Users\Adiel\OneDrive\מסמכים\ForkRepos\ClashCore\src\MyApp.Shared\Services\IMatchMakerService.cs" />
     <None Include="C:\Users\Adiel\OneDrive\מסמכים\ForkRepos\ClashCore\src\MyApp.Shared\package.json" />
@@ -817,6 +814,9 @@
     </Reference>
     <Reference Include="System.Xml.Serialization">
       <HintPath>C:\Program Files\Unity\Hub\Editor\2022.3.42f1\Editor\Data\NetStandard\compat\2.1.0\shims\netfx\System.Xml.Serialization.dll</HintPath>
+    </Reference>
+    <Reference Include="MessagePack.Unity">
+      <HintPath>C:\Users\Adiel\OneDrive\מסמכים\ForkRepos\ClashCore\src\MyApp.Unity\Library\ScriptAssemblies\MessagePack.Unity.dll</HintPath>
     </Reference>
     <Reference Include="UnityEditor.UI">
       <HintPath>C:\Users\Adiel\OneDrive\מסמכים\ForkRepos\ClashCore\src\MyApp.Unity\Library\ScriptAssemblies\UnityEditor.UI.dll</HintPath>

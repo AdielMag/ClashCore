@@ -1,6 +1,8 @@
 using App.InternalDomains.AppLifetimeService;
 using App.InternalDomains.DebugService;
 using App.InternalDomains.DebugService.InternalDomains.DebugsLogsView.Scripts;
+using App.InternalDomains.LifeTimeScopesRegistry;
+using App.InternalDomains.LoadingScreen.Scripts.Services;
 using App.InternalDomains.NetworkService;
 using App.InternalDomains.PlayersService;
 using App.InternalDomains.SceneService;
@@ -33,6 +35,8 @@ namespace App.Scripts
             builder.Register<SceneService>(Lifetime.Singleton).AsImplementedInterfaces();
             builder.Register<AppLifetimeService>(Lifetime.Singleton).AsImplementedInterfaces();
             builder.Register<PlayersService>(Lifetime.Singleton).AsImplementedInterfaces();
+            builder.Register<LifeTimeScopesRegistry>(Lifetime.Singleton).AsImplementedInterfaces();
+            builder.Register<LoadingScreenService>(Lifetime.Singleton).AsImplementedInterfaces();
         }
         
         private void RegisterViews(IContainerBuilder builder)

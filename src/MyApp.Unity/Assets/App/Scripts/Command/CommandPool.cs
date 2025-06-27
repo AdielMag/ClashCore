@@ -5,15 +5,22 @@ using App.InternalDomains.DebugService;
 
 namespace App.Scripts.Command
 {
-    public abstract class CommandPool<TCommand> where TCommand : ICommand, new()
+    public class CommandPool<TCommand> where TCommand : ICommand
     {
-        [Inject] private IDebugService _debugService;
-        
-        private readonly List<TCommand> _pool;
-        private readonly int _maxPoolSize;
+        private readonly IObjectResolver _resolver;
+        private readonly IDebugService _debugService;
         private readonly object _lockObject = new();
 
-        protected CommandPool(int maxPoolSize)
+        private List<TCommand> _pool;
+        private int _maxPoolSize;
+
+        protected CommandPool(IObjectResolver resolver, IDebugService debugService)
+        {
+            _resolver = resolver;
+            _debugService = debugService;
+        }
+
+        public void SetPoolSize(int maxPoolSize)
         {
             _maxPoolSize = maxPoolSize;
             _pool = new List<TCommand>(maxPoolSize);
@@ -33,7 +40,7 @@ namespace App.Scripts.Command
             }
 
             _debugService.Log($"Create new command: {typeof(TCommand).Name}");
-            return new TCommand();
+            return _resolver.Resolve<TCommand>();
         }
 
         public void Return(TCommand command)

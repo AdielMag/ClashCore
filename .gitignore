@@ -108,3 +108,8 @@ crashlytics-build.properties
 **/appsettings.json
 src/https/aspnetapp.pfx
 https/aspnetapp.pfx
+src/MyApp.Shared/.artifacts/obj/MyApp.Shared/MyApp.Shared.csproj.nuget.dgspec.json
+*.props
+*.targets
+src/MyApp.Shared/.artifacts/obj/MyApp.Shared/project.assets.json
+src/MyApp.Shared/.artifacts/obj/MyApp.Shared/project.packagespec.json

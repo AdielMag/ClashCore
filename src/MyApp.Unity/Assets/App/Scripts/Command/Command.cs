@@ -29,6 +29,8 @@ namespace App.Scripts.Command
 
     public abstract class Command : CommandBase, ICommand
     {
+        public Command() {}
+        
         public abstract UniTask ExecuteAsync(CancellationToken cancellationToken = default);
     }
     

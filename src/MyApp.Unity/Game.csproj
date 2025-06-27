@@ -62,33 +62,24 @@
     <Analyzer Include="C:\Program Files\Unity\Hub\Editor\2022.3.42f1\Editor\Data\Tools\Unity.SourceGenerators\Unity.Properties.SourceGenerator.dll" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\App\SubDomains\Game\SubDomains\CameraManager\Scripts\ICameraManager.cs" />
-    <Compile Include="Assets\App\SubDomains\Game\SubDomains\Environment\Scripts\Interface\IEnvironmentManager.cs" />
-    <Compile Include="Assets\App\SubDomains\Game\SubDomains\Environment\Scripts\Manager\EnvironmentManager.cs" />
-    <Compile Include="Assets\App\SubDomains\Game\SubDomains\CameraManager\Scripts\CameraManager.cs" />
     <Compile Include="Assets\App\SubDomains\Game\SubDomains\PlayerView\Scripts\Provider\PlayerViewParentProvider.cs" />
     <Compile Include="Assets\App\SubDomains\Game\SubDomains\PlayerView\Scripts\Interface\IPlayerViewParentProvider.cs" />
+    <Compile Include="Assets\App\SubDomains\Game\SubDomains\QuitButton\Scripts\View\QuitButtonView.cs" />
     <Compile Include="Assets\App\SubDomains\Game\Scripts\View\DynamicOnScreenJoystick.cs" />
-    <Compile Include="Assets\App\SubDomains\Game\SubDomains\PlayerController\Scripts\ScriptableObjects\PlayerPhysicsSettings.cs" />
-    <Compile Include="Assets\App\SubDomains\Game\SubDomains\MovementAnimator\Scripts\MovementAnimator.cs" />
-    <Compile Include="Assets\App\SubDomains\Game\SubDomains\PlayersManager\PlayersManager.cs" />
-    <Compile Include="Assets\App\SubDomains\Game\SubDomains\Environment\Scripts\Provider\EnvironmentParentProvider.cs" />
-    <Compile Include="Assets\App\SubDomains\Game\SubDomains\PlayersManager\ILocalPlayerProvider.cs" />
+    <Compile Include="Assets\App\SubDomains\Game\Scripts\Interface\ILocalPlayerProvider.cs" />
+    <Compile Include="Assets\App\SubDomains\Game\Scripts\Interface\IPlayerController.cs" />
+    <Compile Include="Assets\App\SubDomains\Game\Assets\Players\New\Kevin Iglesias\Human Animations\Scripts\SpineProxy.cs" />
     <Compile Include="Assets\App\SubDomains\Game\SubDomains\Transformable\Transformable.cs" />
+    <Compile Include="Assets\App\SubDomains\Game\Scripts\Interface\IPlayersManager.cs" />
     <Compile Include="Assets\App\SubDomains\Game\Scripts\Utils\CurveUtils.cs" />
-    <Compile Include="Assets\App\SubDomains\Game\SubDomains\PlayersManager\IPlayersManager.cs" />
-    <Compile Include="Assets\App\SubDomains\Game\SubDomains\GameNetworkHub\IGameHubNetworkManager.cs" />
     <Compile Include="Assets\App\SubDomains\Game\Scripts\GameLifeTimeScope.cs" />
-    <Compile Include="Assets\App\SubDomains\Game\SubDomains\PlayerController\Scripts\Controller\RemotePlayerController.cs" />
-    <Compile Include="Assets\App\SubDomains\Game\SubDomains\PlayerController\Scripts\Controller\PlayerControllerBase.cs" />
     <Compile Include="Assets\App\SubDomains\Game\Scripts\GameStarter.cs" />
-    <Compile Include="Assets\App\SubDomains\Game\SubDomains\PlayerController\Scripts\Controller\LocalPlayerController.cs" />
-    <Compile Include="Assets\App\SubDomains\Game\SubDomains\InputManager\Scripts\IInputManager.cs" />
-    <Compile Include="Assets\App\SubDomains\Game\SubDomains\PlayerController\Scripts\Interface\IPlayerController.cs" />
+    <Compile Include="Assets\App\SubDomains\Game\Scripts\Interface\ICameraManager.cs" />
+    <Compile Include="Assets\App\SubDomains\Game\Scripts\Command\QuitGameCommand.cs" />
+    <Compile Include="Assets\App\SubDomains\Game\Scripts\Interface\IEnvironmentManager.cs" />
+    <Compile Include="Assets\App\SubDomains\Game\Scripts\Interface\IGameHubNetworkManager.cs" />
+    <Compile Include="Assets\App\SubDomains\Game\Scripts\Interface\IInputManager.cs" />
     <Compile Include="Assets\App\SubDomains\Game\SubDomains\PlayerView\Scripts\View\PlayerView.cs" />
-    <Compile Include="Assets\App\SubDomains\Game\SubDomains\Environment\Scripts\Interface\IEnvironmentParentProvider.cs" />
-    <Compile Include="Assets\App\SubDomains\Game\SubDomains\InputManager\Scripts\InputManager.cs" />
-    <Compile Include="Assets\App\SubDomains\Game\SubDomains\GameNetworkHub\GameHubNetworkManager.cs" />
     <None Include="Assets\App\SubDomains\Game\Game.asmdef" />
     <Reference Include="UnityEngine">
       <HintPath>C:\Program Files\Unity\Hub\Editor\2022.3.42f1\Editor\Data\Managed\UnityEngine\UnityEngine.dll</HintPath>

@@ -62,8 +62,15 @@
     <Analyzer Include="C:\Program Files\Unity\Hub\Editor\2022.3.42f1\Editor\Data\Tools\Unity.SourceGenerators\Unity.Properties.SourceGenerator.dll" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\App\Scripts\VContainerExtensions\LifeTimeScopes\SubLifeTimeScope.cs" />
+    <Compile Include="Assets\App\InternalDomains\LifeTimeScopesRegistry\LifeTimeScopeSubscriber.cs" />
+    <Compile Include="Assets\App\InternalDomains\LoadingScreen\Scripts\View\LoadingScreenBar.cs" />
+    <Compile Include="Assets\App\InternalDomains\LoadingScreen\Scripts\LoadingScreenLifeTimeScope.cs" />
     <Compile Include="Assets\App\InternalDomains\PlayersService\IPlayersService.cs" />
+    <Compile Include="Assets\App\Scripts\VContainerExtensions\LifeTimeScopes\PrimaryLifeTimeScope.cs" />
     <Compile Include="Assets\App\InternalDomains\DebugService\InternalDomains\DebugsLogsView\Scripts\IDebugLogsView.cs" />
+    <Compile Include="Assets\App\InternalDomains\LifeTimeScopesRegistry\ILifeTimeScopeRegistry.cs" />
+    <Compile Include="Assets\App\Scripts\Utils\CancellationTokenSourceExtensions.cs" />
     <Compile Include="Assets\App\InternalDomains\NetworkService\NetworkService.cs" />
     <Compile Include="Assets\App\Scripts\MagicOnionGeneratedClientInitializer.cs" />
     <Compile Include="Assets\App\Scripts\Command\Command.cs" />
@@ -76,9 +83,13 @@
     <Compile Include="Assets\App\InternalDomains\AppLifetimeService\IAppLifetimeService.cs" />
     <Compile Include="Assets\App\InternalDomains\DebugService\InternalDomains\DebugsLogsView\Scripts\DebugLogsView.cs" />
     <Compile Include="Assets\App\InternalDomains\AppLifetimeService\AppLifetimeService.cs" />
+    <Compile Include="Assets\App\InternalDomains\LifeTimeScopesRegistry\LifeTimeScopesRegistry.cs" />
     <Compile Include="Assets\App\Scripts\Command\ICommand.cs" />
+    <Compile Include="Assets\App\InternalDomains\LoadingScreen\Scripts\Services\ILoadingScreenService.cs" />
     <Compile Include="Assets\App\Scripts\AppLifetimeScope.cs" />
     <Compile Include="Assets\App\InternalDomains\PlayersService\IPlayerIdProvider.cs" />
+    <Compile Include="Assets\App\InternalDomains\LifeTimeScopesRegistry\LifeTimeScopeType.cs" />
+    <Compile Include="Assets\App\InternalDomains\LoadingScreen\Scripts\Services\LoadingScreenService.cs" />
     <Compile Include="Assets\App\Scripts\AppStarter.cs" />
     <Compile Include="Assets\App\Scripts\Command\CommandPool.cs" />
     <Compile Include="Assets\App\InternalDomains\PlayersService\PlayersService.cs" />
@@ -757,6 +768,9 @@
     </Reference>
     <Reference Include="Unity.TextMeshPro">
       <HintPath>C:\Users\Adiel\OneDrive\מסמכים\ForkRepos\ClashCore\src\MyApp.Unity\Library\ScriptAssemblies\Unity.TextMeshPro.dll</HintPath>
+    </Reference>
+    <Reference Include="MessagePack.Unity">
+      <HintPath>C:\Users\Adiel\OneDrive\מסמכים\ForkRepos\ClashCore\src\MyApp.Unity\Library\ScriptAssemblies\MessagePack.Unity.dll</HintPath>
     </Reference>
     <Reference Include="UnityEditor.UI">
       <HintPath>C:\Users\Adiel\OneDrive\מסמכים\ForkRepos\ClashCore\src\MyApp.Unity\Library\ScriptAssemblies\UnityEditor.UI.dll</HintPath>

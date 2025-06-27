@@ -111,8 +111,12 @@ public class ScenesInProjectWindow : EditorWindow
                 fontStyle = FontStyle.Bold,
             };
 
+            // Layout for button, select, and toggle
             var buttonRect = rowRect;
-            buttonRect.width -= 30f;
+            buttonRect.width -= 60f; // leave space for select and toggle
+
+            var selectRect = new Rect(rowRect.xMax - 75f, rowRect.y + 5f, 50f, 20f);
+            var toggleRect = new Rect(rowRect.xMax - 20f, rowRect.y + 5f, 18f, 18f);
 
             if (GUI.Button(buttonRect, fileName, labelStyle))
             {
@@ -120,7 +124,13 @@ public class ScenesInProjectWindow : EditorWindow
                     EditorSceneManager.OpenScene(path);
             }
 
-            var toggleRect = new Rect(rowRect.xMax - 20f, rowRect.y + 5f, 18f, 18f);
+            if (GUI.Button(selectRect, "Select"))
+            {
+                var sceneAsset = AssetDatabase.LoadAssetAtPath<UnityEngine.Object>(path);
+                if (sceneAsset != null)
+                    Selection.activeObject = sceneAsset;
+            }
+
             bool newState = GUI.Toggle(toggleRect, inBuild, GUIContent.none);
             if (newState != inBuild)
                 ToggleSceneInBuild(path, newState);

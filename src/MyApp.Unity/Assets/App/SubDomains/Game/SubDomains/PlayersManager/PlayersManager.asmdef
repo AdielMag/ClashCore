@@ -1,0 +1,9 @@
+{
+  "name": "PlayersManager",
+  "references": ["App", "VContainer","MyApp.Shared.Unity","Game", "UniTask"],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "autoReferenced": true
+}
+

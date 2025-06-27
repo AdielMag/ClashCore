@@ -1,0 +1,9 @@
+{
+  "name": "App.CameraManager",
+  "references": ["App", "Game", "Cinemachine", "VContainer"],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "autoReferenced": true
+}
+

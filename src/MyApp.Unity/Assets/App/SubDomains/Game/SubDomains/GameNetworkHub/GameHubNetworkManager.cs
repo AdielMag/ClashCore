@@ -10,8 +10,6 @@ using Cysharp.Threading.Tasks;
 using Shared.Data;
 using Shared.Hubs;
 
-using VContainer;
-
 using Quaternion = System.Numerics.Quaternion;
 using Vector3 = System.Numerics.Vector3;
 
@@ -19,13 +17,22 @@ namespace App.SubDomains.Game.SubDomains.GameNetworkHub
 {
     public class GameHubNetworkManager : IGameHubNetworkManager, IGameHubReceiver, IDisposable
     {
-        [Inject] private readonly IDebugService _debugService;
-        [Inject] private readonly INetworkService _networkService;
-        [Inject] private readonly IPlayersManager _playersManager;
+        private readonly IDebugService _debugService;
+        private readonly INetworkService _networkService;
+        private readonly IPlayersManager _playersManager;
         
         private IGameHub _client;
         private string _localPlayerId;
-        
+
+        public GameHubNetworkManager(IDebugService debugService,
+                                     INetworkService networkService,
+                                     IPlayersManager playersManager)
+        {
+            _debugService = debugService;
+            _networkService = networkService;
+            _playersManager = playersManager;
+        }
+
         public async UniTask ConnectAsync(string roomName, string playerId)
         {
             _debugService.Log("Connecting to GameHub...");

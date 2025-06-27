@@ -1,12 +1,8 @@
 ﻿using MessagePack;
-using MessagePack.Formatters;
 using MessagePack.Resolvers;
-using Shared.Formatters;
+using MessagePack.Unity;
 
-using QuaternionFormatter = Shared.Formatters.QuaternionFormatter;
-using Vector3Formatter = Shared.Formatters.Vector3Formatter;
-
-namespace Shared.Helpers
+namespace Shared.Helpersl
 {
     public static class MessagePackResolverConfig
     {
@@ -14,19 +10,13 @@ namespace Shared.Helpers
 
         static MessagePackResolverConfig()
         {
-            var customFormatters = new IMessagePackFormatter[]
+            var resolvers = new []
             {
-                new Vector3Formatter(),
-                new QuaternionFormatter(),
-                new PlayerFormatter()
+                StandardResolverAllowPrivate.Instance,
+                UnityResolver.InstanceWithStandardResolver
             };
 
-            var resolvers = new IFormatterResolver[]
-            {
-                StandardResolverAllowPrivate.Instance
-            };
-
-            Resolver = CompositeResolver.Create(customFormatters, resolvers);
+            Resolver = CompositeResolver.Create(resolvers);
         }
     }
 }

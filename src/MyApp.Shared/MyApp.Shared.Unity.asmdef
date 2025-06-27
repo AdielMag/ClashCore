@@ -1,3 +1,16 @@
-﻿{
-  "name": "MyApp.Shared.Unity"
+{
+    "name": "MyApp.Shared.Unity",
+    "rootNamespace": "",
+    "references": [
+        "GUID:034c977408447714e91237bd5f97c1ff"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
 }

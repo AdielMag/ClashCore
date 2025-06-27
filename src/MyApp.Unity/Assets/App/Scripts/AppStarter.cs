@@ -1,34 +1,52 @@
-using System;
-
 using App.InternalDomains.DebugService;
+using App.InternalDomains.LoadingScreen.Scripts.Services;
 using App.InternalDomains.NetworkService;
 using App.InternalDomains.PlayersService;
 using App.InternalDomains.SceneService;
+using App.Scripts.View;
 
 using Cysharp.Threading.Tasks;
 
-using VContainer;
 using VContainer.Unity;
 
 namespace App.Scripts
 {
     public class AppStarter : IInitializable
     {
-        [Inject] private readonly IDebugService _debugService;
-        [Inject] private readonly INetworkService _networkService;
-        [Inject] private readonly ISceneService _sceneService;
-        [Inject] private readonly IPlayersService _playersService;
+        private readonly ISceneService _sceneService;
+        private readonly IPlayersService _playersService;
+        private readonly ILoadingScreenService _loadingScreenService;
         
+        public AppStarter(ISceneService sceneService,
+                          IPlayersService playersService,
+                          ILoadingScreenService loadingScreenService)
+        {
+            _sceneService = sceneService;
+            _playersService = playersService;
+            _loadingScreenService = loadingScreenService;
+        }
+
         public void Initialize()
         {
-            LoadGameSceneAsync().Forget();
+            LoadLobbySceneAsync().Forget();
         }
         
-        private async UniTask LoadGameSceneAsync()
+        private async UniTask LoadLobbySceneAsync()
         {
             await _playersService.Login();
+
+            var loadingBar = await _loadingScreenService.ShowLoadingScreenAsync();
             
-            await _sceneService.LoadSceneAsync(SceneConstants.GameScene);
+            var lobbyLoadingTask = _sceneService.LoadSceneAsync(SceneConstants.LobbyScene);
+            
+            await loadingBar.UpdateProgressAsync(.5f);
+            
+            await lobbyLoadingTask;
+            
+            await loadingBar.UpdateProgressAsync(1);
+            
+            await _loadingScreenService.HideLoadingScreenAsync();
+            
             _sceneService.UnloadSceneAsync(SceneConstants.AppStarter).Forget();
         }
     }

@@ -2,7 +2,7 @@ using MagicOnion.Client;
 using MessagePack;
 using MessagePack.Resolvers;
 using Shared.Services;
-using Shared.Helpers;
+using Shared.Helpersl;
 
 namespace App.Scripts
 {

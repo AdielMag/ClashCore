@@ -14,5 +14,4 @@ namespace Shared.Data
         [Key(2)]
         public Quaternion Rotation { get; set; }
     }
-
 }

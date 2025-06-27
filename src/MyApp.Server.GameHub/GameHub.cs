@@ -122,6 +122,7 @@ namespace Server.Hubs.GamingHub
             try
             {
                 await _currentRoom.Group.RemoveAsync(Context);
+                _connectionManager.CancelDisconnectionTimer(_playerConnection.Id);
                 _currentRoom.Players.TryRemove(_playerConnection.Id, out _);
                 Broadcast(_currentRoom.Group).OnLeave(_playerConnection.TransformData);
                 

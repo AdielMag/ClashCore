@@ -11,4 +11,10 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/App/SubDomains/Game/Scenes/Game.unity
     guid: 994d67decfb89491ba86e808ca4274d8
+  - enabled: 1
+    path: Assets/App/SubDomains/Lobby/Scenes/Lobby.unity
+    guid: 0295632674bfe8d4c86d4eed30be0762
+  - enabled: 1
+    path: Assets/App/InternalDomains/LoadingScreen/Scenes/LoadingScreen.unity
+    guid: fd35aa3f9e1b66048ae27892a3e3ffc6
   m_configObjects: {}

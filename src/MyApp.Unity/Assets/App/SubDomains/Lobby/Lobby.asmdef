@@ -1,0 +1,9 @@
+{
+  "name": "Lobby",
+  "references": ["App", "UniTask", "VContainer"],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "autoReferenced": true
+}
+

@@ -21,5 +21,13 @@ namespace App.Scripts
             MessagePackSerializer.DefaultOptions = MessagePackSerializerOptions.Standard
                .WithResolver(StaticCompositeResolver.Instance);
         }
+        
+#if UNITY_EDITOR
+        [UnityEditor.InitializeOnLoadMethod]
+        static void EditorInitialize()
+        {
+            RegisterResolvers();
+        }
+#endif
     }
 }

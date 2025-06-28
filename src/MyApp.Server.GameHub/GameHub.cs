@@ -72,7 +72,7 @@ namespace Server.Hubs.GamingHub
             await HandlePlayerTimeout();
         }
 
-        public async ValueTask MoveAsync(Vector3 position, Quaternion rotation)
+        public ValueTask MoveAsync(Vector3 position, Quaternion rotation)
         {
             try
             {
@@ -88,7 +88,7 @@ namespace Server.Hubs.GamingHub
                     _logger.LogWarning(
                         $"Invalid movement detected for player {_playerConnection.Id}: {validationResult.ErrorMessage}");
 
-                    return;
+                    return ValueTask.CompletedTask;
                 }
 
                 _playerConnection.UpdateTransform(position, rotation);
@@ -102,6 +102,25 @@ namespace Server.Hubs.GamingHub
                 _logger.LogError(ex, $"Error during MoveAsync for player {_playerConnection?.Id}");
                 throw;
             }
+            
+            return ValueTask.CompletedTask;
+        }
+        
+
+        public ValueTask TargetChangedAsync(string targetId)
+        {
+            try
+            {
+                var playerId = _playerConnection.Id;
+                _logger.LogInformation($"Player {_playerConnection.Id} changed target to {targetId}");
+                Broadcast(_currentRoom.Group).OnTargetChanged(playerId, targetId);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error during TargetChangedAsync for player {_playerConnection?.Id}");
+                throw;
+            }
+            return ValueTask.CompletedTask;
         }
 
         protected override async ValueTask OnDisconnected()

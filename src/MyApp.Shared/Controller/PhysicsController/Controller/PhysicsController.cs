@@ -19,9 +19,6 @@ namespace Shared.Controller.PhysicsController.Controller
         private const float _kEpsilonSq = _kEpsilon * _kEpsilon;
         private const float _kDeg2Rad = MathF.PI / 180f;
 
-        public event Action<PositionChangedEventArgs> ? OnPositionChanged;
-        public event Action<RotationChangedEventArgs> ? OnRotationChanged;
-
         /* ───────────────────── CONFIGURATION / STATE ───────────────────── */
         private ITransformable ? _transform;
         private float _moveSpeed;
@@ -39,8 +36,9 @@ namespace Shared.Controller.PhysicsController.Controller
         private Vector3 _velocity;
         private bool _grounded;
 
-        private readonly PositionChangedEventArgs _positionArgs = new PositionChangedEventArgs();
-        private readonly RotationChangedEventArgs _rotationArgs = new RotationChangedEventArgs();
+        private readonly PositionChangedEventData _positionData = new PositionChangedEventData();
+        private readonly RotationChangedData _rotationArgs = new RotationChangedData();
+        
 
         /* ───────────────────────── INITIALISE ───────────────────────── */
         public void Setup(ITransformable transform,
@@ -63,12 +61,10 @@ namespace Shared.Controller.PhysicsController.Controller
         }
 
         /* ───────────────────────── PUBLIC API ───────────────────────── */
-        public void Move(Vector2 input, float dt)
+        public PositionChangedEventData Move(Vector2 input, float dt)
         {
-            if (_transform is null) throw new InvalidOperationException("Call Setup() first.");
-
-            float inputMagSq = input.LengthSquared();
-            bool hasInput = inputMagSq > _kEpsilonSq;
+            var inputMagSq = input.LengthSquared();
+            var hasInput = inputMagSq > _kEpsilonSq;
 
             // Transition between accel ↔ decel
             if (hasInput != _accelerating)
@@ -82,22 +78,21 @@ namespace Shared.Controller.PhysicsController.Controller
 
             if (_accelerating)
             {
-                float t = MathF.Min(_curveTimer, _accelCurve.Duration);
+                var t = MathF.Min(_curveTimer, _accelCurve.Duration);
                 _speedFactor = _accelCurve.Evaluate(t) / _accelCurve.Evaluate(_accelCurve.Duration);
             }
             else
             {
-                float t = MathF.Min(_curveTimer, _decelCurve.Duration);
+                var t = MathF.Min(_curveTimer, _decelCurve.Duration);
                 _speedFactor = 1f - (_decelCurve.Evaluate(t) / _decelCurve.Evaluate(_decelCurve.Duration));
             }
 
             _speedFactor = Math.Max(_speedFactor, 0f);
 
             // Desired horizontal velocity
-            Vector3 desiredDir =
-                hasInput ? Vector3.Normalize(new Vector3(input.X, 0f, input.Y)) : Vector3.Zero;
+            var desiredDir = hasInput ? Vector3.Normalize(new Vector3(input.X, 0f, input.Y)) : Vector3.Zero;
 
-            Vector3 desiredHorVel = desiredDir * (_moveSpeed * _speedFactor);
+            var desiredHorVel = desiredDir * (_moveSpeed * _speedFactor);
 
             // Preserve vertical velocity / gravity
             _velocity.X = desiredHorVel.X;
@@ -105,8 +100,8 @@ namespace Shared.Controller.PhysicsController.Controller
             _velocity.Y = _grounded ? 0f : _velocity.Y + _kGravity * dt;
 
             // Integrate position
-            Vector3 oldPos = _transform.Position;
-            Vector3 newPos = oldPos + _velocity * dt;
+            var oldPos = _transform.Position;
+            var newPos = oldPos + _velocity * dt;
 
             // Simple ground collision (plane Y=0)
             if (newPos.Y <= 0f)
@@ -123,49 +118,66 @@ namespace Shared.Controller.PhysicsController.Controller
             if (Moved(newPos, oldPos))
             {
                 _transform.Position = newPos;
-                _positionArgs.Update(oldPos, newPos);
-                OnPositionChanged?.Invoke(_positionArgs);
+                _positionData.Update(oldPos, newPos);
             }
+
+            return _positionData;
         }
 
-        public void Rotate(Vector2 input, float dt)
+        public RotationChangedData Rotate(Vector2 input, float dt)
         {
-            if (_transform is null ||
-                input.LengthSquared() <= _kEpsilonSq) return;
+            var passedRotationThreshold = input.LengthSquared() > _kEpsilonSq;
+            if (passedRotationThreshold)
+            {
+                var targetYaw = MathF.Atan2(input.X, input.Y);
+                var currentYaw = GetYawRad(_transform.Rotation);
+                var delta = Normalise(targetYaw - currentYaw);
 
-            float targetYaw = MathF.Atan2(input.X, input.Y);
-            float currentYaw = GetYawRad(_transform.Rotation);
-            float delta = Normalise(targetYaw - currentYaw);
+                var maxStep = _rotSpeedRad * dt;
+                var step = MathF.Abs(delta) <= maxStep ? delta : MathF.Sign(delta) * maxStep;
 
-            float maxStep = _rotSpeedRad * dt;
-            float step = MathF.Abs(delta) <= maxStep ? delta : MathF.Sign(delta) * maxStep;
-            if (MathF.Abs(step) <= 1e-6f) return;
+                if (! (MathF.Abs(step) <= 1e-6f))
+                {
+                    var oldRot = _transform.Rotation;
+                    var newRot = YawQuat(currentYaw + step);
+                    _transform.Rotation = newRot;
+                    _rotationArgs.Update(oldRot, newRot);
+                }
+            }
 
-            Quaternion oldRot = _transform.Rotation;
-            Quaternion newRot = YawQuat(currentYaw + step);
-            _transform.Rotation = newRot;
-            _rotationArgs.Update(oldRot, newRot);
-            OnRotationChanged?.Invoke(_rotationArgs);
+            return _rotationArgs;
+        }
+
+        public void SetMoveSpeed(float moveSpeed)
+        {
+            _moveSpeed = moveSpeed;
+        }
+
+        public void SetRotationSpeedDeg(float rotationSpeedDeg)
+        {
+            _rotSpeedRad = rotationSpeedDeg * _kDeg2Rad;
         }
 
         /* ────────────────────────── HELPERS ────────────────────────── */
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static float GetYawRad(in Quaternion q) =>
-            MathF.Atan2(2f * (q.W * q.Y + q.X * q.Z), 1f - 2f * (q.Y * q.Y + q.X * q.X));
+        private static float GetYawRad(in Quaternion q)
+        {
+            return MathF.Atan2(2f * (q.W * q.Y + q.X * q.Z), 1f - 2f * (q.Y * q.Y + q.X * q.X));
+        }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static Quaternion YawQuat(float yawRad)
         {
-            float half = yawRad * 0.5f;
+            var half = yawRad * 0.5f;
             return new Quaternion(0f, MathF.Sin(half), 0f, MathF.Cos(half));
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static float Normalise(float a)
         {
-            const float TwoPi = 2f * MathF.PI;
-            a %= TwoPi;
-            return a > MathF.PI ? a - TwoPi : a < -MathF.PI ? a + TwoPi : a;
+            const float twoPi = 2f * MathF.PI;
+            a %= twoPi;
+            return a > MathF.PI ? a - twoPi : a < -MathF.PI ? a + twoPi : a;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -175,36 +187,59 @@ namespace Shared.Controller.PhysicsController.Controller
             return (dx * dx + dy * dy + dz * dz) > _kEpsilonSq;
         }
 
-        public void Dispose() => _transform = null;
+        public void Dispose()
+        {
+            _transform = null;
+        }
     }
 }
 
 /* ───────────────────── POOLABLE EVENT ARGUMENTS ───────────────────── */
-    public sealed class PositionChangedEventArgs : EventArgs
-    {
-        public Vector3 OldPosition { get; private set; }
-        public Vector3 NewPosition { get; private set; }
+public sealed class PositionChangedEventData
+{
+    public bool HasMoved => ! OldPosition.Equals(NewPosition);
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public PositionChangedEventArgs Update(Vector3 oldPos, Vector3 newPos)
-        {
-            OldPosition = oldPos;
-            NewPosition = newPos;
-            return this;
-        }
+    public Vector3 OldPosition
+    {
+        get;
+        private set;
     }
 
-    public sealed class RotationChangedEventArgs : EventArgs
+    public Vector3 NewPosition
     {
-        public Quaternion OldRotation { get; private set; }
-        public Quaternion NewRotation { get; private set; }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public RotationChangedEventArgs Update(Quaternion oldRot, Quaternion newRot)
-        {
-            OldRotation = oldRot;
-            NewRotation = newRot;
-            return this;
-        }
+        get;
+        private set;
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public PositionChangedEventData Update(Vector3 oldPos, Vector3 newPos)
+    {
+        OldPosition = oldPos;
+        NewPosition = newPos;
+        return this;
+    }
+}
+
+public sealed class RotationChangedData
+{
+    public bool HasRotated => ! OldRotation.Equals(NewRotation);
+    public Quaternion OldRotation
+    {
+        get;
+        private set;
+    }
+
+    public Quaternion NewRotation
+    {
+        get;
+        private set;
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public RotationChangedData Update(Quaternion oldRot, Quaternion newRot)
+    {
+        OldRotation = oldRot;
+        NewRotation = newRot;
+        return this;
+    }
+}

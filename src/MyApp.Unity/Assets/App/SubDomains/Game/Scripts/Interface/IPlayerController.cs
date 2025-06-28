@@ -13,6 +13,7 @@ namespace App.SubDomains.Game.SubDomains.PlayerController.Scripts.@interface
         
         void Create(TransformData transformData);
         void UpdatePositionAndRotation(Vector3 position, Quaternion rotation);
+        void UpdateTarget(Transform target);
         void LateTick();
         void Dispose();
     }

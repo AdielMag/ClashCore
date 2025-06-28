@@ -23,7 +23,7 @@ namespace App.SubDomains.Game.SubDomains.PlayerController.Scripts.Controller
         
         protected TransformData transform;
         protected PlayerView.Scripts.View.PlayerView view;
-        
+
         public virtual void Create(TransformData transformData)
         {
             transform = transformData;
@@ -37,6 +37,11 @@ namespace App.SubDomains.Game.SubDomains.PlayerController.Scripts.Controller
         {
             view.Position = position;
             view.Rotation = rotation;
+        }
+        
+        public virtual void UpdateTarget(Transform target)
+        {
+            view.PlayerVisualController.UpdateLookAtTarget(target);
         }
 
         public abstract void LateTick();

@@ -12,5 +12,6 @@ namespace Shared.Hubs
         ValueTask<TransformData[]> JoinAsync(string roomName, string id, Vector3 position, Quaternion rotation);
         ValueTask LeaveAsync();
         ValueTask MoveAsync(Vector3 position, Quaternion rotation);
+        ValueTask TargetChangedAsync(string targetId);
     }
 }

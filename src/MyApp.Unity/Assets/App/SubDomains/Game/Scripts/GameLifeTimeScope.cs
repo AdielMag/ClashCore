@@ -1,8 +1,6 @@
 using App.Scripts.Command;
 using App.Scripts.VContainerExtensions.LifeTimeScopes;
 using App.SubDomains.Game.Scripts.Command;
-using App.SubDomains.Game.SubDomains.PlayerView.Scripts.Provider;
-using App.SubDomains.Game.SubDomains.PlayerView.Scripts.View;
 
 using Cinemachine;
 
@@ -18,8 +16,7 @@ namespace App.SubDomains.Game.Scripts
     public class GameLifeTimeScope : PrimaryLifeTimeScope
     {
         [Space]
-        [SerializeField] private PlayerView playerViewPrefab;
-        [SerializeField] private PlayerViewParentProvider playersViewParent;
+
         [SerializeField] private CinemachineVirtualCamera virtualCamera;
         [SerializeField] private CinemachineBrain cameraBrain;
         [SerializeField] private InputActionAsset inputActionAsset;
@@ -41,8 +38,6 @@ namespace App.SubDomains.Game.Scripts
 
         private void RegisterComponents(IContainerBuilder builder)
         {
-            builder.RegisterInstance(playerViewPrefab);
-            builder.RegisterInstance(playersViewParent).AsImplementedInterfaces();
             builder.RegisterInstance(virtualCamera);
             builder.RegisterInstance(cameraBrain);
             builder.RegisterInstance(inputActionAsset);

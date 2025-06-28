@@ -3,6 +3,8 @@ using App.SubDomains.Game.SubDomains.GameNetworkHub;
 using App.SubDomains.Game.SubDomains.InputManager.Scripts;
 using App.SubDomains.Game.SubDomains.PlayerController.Scripts.ScriptableObjects;
 
+using Cysharp.Threading.Tasks;
+
 using Shared.Controller.PhysicsController.Interface;
 using Shared.Data;
 
@@ -30,35 +32,42 @@ namespace App.SubDomains.Game.SubDomains.PlayerController.Scripts.Controller
             var accelerationCurve = _playerPhysicsSettings.AccelerationCurve.ToPhysicsCurve();
             var decelerationCurve = _playerPhysicsSettings.DecelerationCurve.ToPhysicsCurve();
 
-            _physicsController.Setup(view, _playerPhysicsSettings.Speed, _playerPhysicsSettings.RotationSpeed,
-                                     accelerationCurve, decelerationCurve);
-            
-            _physicsController.OnPositionChanged += HandlePositionChanged;
-            _physicsController.OnRotationChanged += HandleRotationChanged;
+            _physicsController.Setup(view,
+                                     _playerPhysicsSettings.Speed,
+                                     _playerPhysicsSettings.RotationSpeed,
+                                     accelerationCurve,
+                                     decelerationCurve);
+
+            SetLookAtTarget();
         }
 
         public override void LateTick()
         {
-            _physicsController.Move(_inputManager.NormalizedMovement, Time.deltaTime); 
-            _physicsController.Rotate(_inputManager.NormalizedMovement, Time.deltaTime);
+            var positionChangedData =
+                _physicsController.Move(_inputManager.NormalizedMovement, Time.deltaTime);
+            if (positionChangedData.HasMoved)
+            {
+                _gameHub.MoveAsync(view.Position, view.Rotation).Forget();
+            }
+
+            var rotationChangedData =
+                _physicsController.Rotate(_inputManager.NormalizedMovement, Time.deltaTime);
+            if (rotationChangedData.HasRotated)
+            {
+                _gameHub.MoveAsync(view.Position, view.Rotation).Forget();
+            }
         }
         
-        private void HandlePositionChanged(PositionChangedEventArgs eventArgs)
+        private void SetLookAtTarget()
         {
-            _gameHub.MoveAsync(view.Position, view.Rotation);
-        }
-
-        private void HandleRotationChanged(RotationChangedEventArgs eventArgs)
-        {
-            _gameHub.MoveAsync(view.Position, view.Rotation);
+            _gameHub.TargetChangedAsync("Test").Forget();
+            _physicsController.SetMoveSpeed(_playerPhysicsSettings.LookAtSpeed);
         }
         
         public override void Dispose()
         {
             base.Dispose();
             
-            _physicsController.OnPositionChanged -= HandlePositionChanged;
-            _physicsController.OnRotationChanged -= HandleRotationChanged;
             _physicsController.Dispose();
         }
     }

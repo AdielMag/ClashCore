@@ -13,7 +13,7 @@ OcclusionCullingSettings:
 --- !u!104 &2
 RenderSettings:
   m_ObjectHideFlags: 0
-  serializedVersion: 9
+  serializedVersion: 10
   m_Fog: 0
   m_FogColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
   m_FogMode: 3
@@ -42,8 +42,8 @@ RenderSettings:
 --- !u!157 &3
 LightmapSettings:
   m_ObjectHideFlags: 0
-  serializedVersion: 12
-  m_GIWorkflowMode: 1
+  serializedVersion: 13
+  m_BakeOnSceneLoad: 0
   m_GISettings:
     serializedVersion: 2
     m_BounceScale: 1
@@ -66,9 +66,6 @@ LightmapSettings:
     m_LightmapParameters: {fileID: 0}
     m_LightmapsBakeMode: 1
     m_TextureCompression: 1
-    m_FinalGather: 0
-    m_FinalGatherFiltering: 1
-    m_FinalGatherRayCount: 256
     m_ReflectionCompression: 2
     m_MixedBakeMode: 2
     m_BakeBackend: 1
@@ -243,8 +240,6 @@ MonoBehaviour:
   - {fileID: 1055926021}
   - {fileID: 1055926020}
   - {fileID: 1055926024}
-  playerViewPrefab: {fileID: 8119397481466623178, guid: ceb574fc0074945428f25d5b411a8ab5, type: 3}
-  playersViewParent: {fileID: 885643700}
   virtualCamera: {fileID: 1866857040}
   cameraBrain: {fileID: 1815859008}
   inputActionAsset: {fileID: -944628639613478452, guid: 6e3fe4753eded4930a8256e18facf7d3, type: 3}
@@ -276,6 +271,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   playerPhysicsSettings: {fileID: 11400000, guid: 7452a948e6f7d734eac1a7936051c627, type: 2}
+  playerViewPrefab: {fileID: 8119397481466623178, guid: ceb574fc0074945428f25d5b411a8ab5, type: 3}
+  playersViewParent: {fileID: 885643700}
 --- !u!114 &1055926021
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -408,6 +405,7 @@ MonoBehaviour:
   m_DeselectOnBackgroundClick: 1
   m_PointerBehavior: 0
   m_CursorLockBehavior: 0
+  m_ScrollDeltaPerTick: 6
 --- !u!1 &1676724548
 GameObject:
   m_ObjectHideFlags: 0

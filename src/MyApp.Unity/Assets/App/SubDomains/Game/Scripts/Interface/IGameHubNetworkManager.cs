@@ -10,6 +10,7 @@ namespace App.SubDomains.Game.SubDomains.GameNetworkHub
         UniTask ConnectAsync(string roomName, string playerId);
         UniTask LeaveAsync();
         UniTask MoveAsync(Vector3 position, Quaternion rotation);
+        UniTask TargetChangedAsync(string targetId);
         UniTask WaitForDisconnect();
     }
 }

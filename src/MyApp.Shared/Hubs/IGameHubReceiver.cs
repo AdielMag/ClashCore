@@ -7,5 +7,6 @@ namespace Shared.Hubs
         void OnJoin(TransformData transformData);
         void OnLeave(TransformData transformData);
         void OnMove(TransformData transformData);
+        void OnTargetChanged(string playerId, string targetId);
     }
 }

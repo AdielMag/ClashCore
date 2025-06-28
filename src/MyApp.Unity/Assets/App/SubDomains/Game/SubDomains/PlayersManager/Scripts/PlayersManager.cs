@@ -1,14 +1,17 @@
 using System.Collections.Generic;
-using System.Numerics;
 
 using App.SubDomains.Game.SubDomains.PlayerController.Scripts.Controller;
 using App.SubDomains.Game.SubDomains.PlayerController.Scripts.@interface;
 
 using Shared.Data;
 
+using UnityEngine;
 
 using VContainer;
 using VContainer.Unity;
+
+using Quaternion = System.Numerics.Quaternion;
+using Vector3 = System.Numerics.Vector3;
 
 namespace App.SubDomains.Game.SubDomains.PlayersManager
 {
@@ -20,10 +23,20 @@ namespace App.SubDomains.Game.SubDomains.PlayersManager
             private set;
         }
         
-        [Inject] private readonly IObjectResolver _resolver;
+        private readonly IObjectResolver _resolver;
         
         private readonly Dictionary<string, IPlayerController> _playersControllers = new();
-        
+
+        private Transform testTransform;
+
+        public PlayersManager(IObjectResolver resolver)
+        {
+            _resolver = resolver;
+            testTransform = new GameObject("TestTarget").transform;
+            testTransform.position = UnityEngine.Vector3.zero;
+            testTransform.rotation = UnityEngine.Quaternion.identity;
+        }
+
         public void OnPlayerJoined(TransformData transformData, bool isRemote)
         {
             IPlayerController controller = isRemote ?
@@ -55,6 +68,22 @@ namespace App.SubDomains.Game.SubDomains.PlayersManager
             }
             
             controller.UpdatePositionAndRotation(position, rotation);
+        }
+        
+        public void OnPlayerTargetChanged(string playerId, string targetId)
+        {
+            if (! _playersControllers.TryGetValue(playerId, out var controller) ||
+                ! _playersControllers.TryGetValue(targetId, out var targetController))
+            {
+                if (targetId == "Test")
+                {
+                    controller.UpdateTarget(testTransform);
+                }
+                
+                return;
+            }
+
+            controller.UpdateTarget(targetController.ViewGameObject.transform);
         }
 
         public void LateTick()

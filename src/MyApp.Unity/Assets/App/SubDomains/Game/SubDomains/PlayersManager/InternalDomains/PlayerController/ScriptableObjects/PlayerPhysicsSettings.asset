@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: PlayerPhysicsSettings
   m_EditorClassIdentifier: 
   speed: 26
+  lookAtSpeed: 16
   rotationSpeed: 720
   accelerationCurve:
     serializedVersion: 2

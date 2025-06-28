@@ -68,12 +68,23 @@ namespace App.SubDomains.Game.SubDomains.GameNetworkHub
         {
             return _client.MoveAsync(position, rotation).AsUniTask();
         }
-        
+
+        public UniTask TargetChangedAsync(string targetId)
+        {
+            if (! string.IsNullOrEmpty(targetId))
+            {
+                return _client.TargetChangedAsync(targetId).AsUniTask();
+            }
+
+            _debugService.LogWarning("Target ID is null or empty. Cannot change target.");
+            return UniTask.CompletedTask;
+        }
+
         public UniTask WaitForDisconnect()
         {
             return _client.WaitForDisconnect().AsUniTask();
         }
-        
+
         void IGameHubReceiver.OnJoin(TransformData transformData)
         {
             _debugService.Log("Join Player:" + transformData.Id);
@@ -92,6 +103,11 @@ namespace App.SubDomains.Game.SubDomains.GameNetworkHub
         void IGameHubReceiver.OnMove(TransformData transformData)
         {
             _playersManager.OnPlayerMoved(transformData.Id, transformData.Position, transformData.Rotation);
+        }
+
+        void IGameHubReceiver.OnTargetChanged(string playerId, string targetId)
+        {
+            _playersManager.OnPlayerTargetChanged(playerId, targetId);
         }
 
         public void Dispose()

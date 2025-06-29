@@ -210,6 +210,7 @@ GameObject:
   - component: {fileID: 1055926021}
   - component: {fileID: 1055926020}
   - component: {fileID: 1055926024}
+  - component: {fileID: 1055926025}
   m_Layer: 0
   m_Name: GameLifetimeScope
   m_TagString: Untagged
@@ -240,6 +241,7 @@ MonoBehaviour:
   - {fileID: 1055926021}
   - {fileID: 1055926020}
   - {fileID: 1055926024}
+  - {fileID: 1055926025}
   virtualCamera: {fileID: 1866857040}
   cameraBrain: {fileID: 1815859008}
   inputActionAsset: {fileID: -944628639613478452, guid: 6e3fe4753eded4930a8256e18facf7d3, type: 3}
@@ -320,6 +322,18 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 7760b2b5ad994fa6a6e16fce28fa6826, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &1055926025
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1055926017}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3165e5158aae40a2a35a947a702c1e1a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!224 &1160392282 stripped

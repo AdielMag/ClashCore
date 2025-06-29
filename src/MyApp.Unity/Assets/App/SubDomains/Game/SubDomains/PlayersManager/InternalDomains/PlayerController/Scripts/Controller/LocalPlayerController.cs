@@ -1,3 +1,4 @@
+using App.SubDomains.Game.Scripts.Interface;
 using App.SubDomains.Game.Scripts.Utils;
 using App.SubDomains.Game.SubDomains.GameNetworkHub;
 using App.SubDomains.Game.SubDomains.InputManager.Scripts;
@@ -16,11 +17,24 @@ namespace App.SubDomains.Game.SubDomains.PlayerController.Scripts.Controller
 {
     public class LocalPlayerController : PlayerControllerBase
     {
-        [Inject] private readonly IInputManager _inputManager;
-        [Inject] private readonly IGameHubNetworkManager _gameHub;
-        [Inject] private readonly PlayerPhysicsSettings _playerPhysicsSettings;
-        
+        private readonly IInputManager _inputManager;
+        private readonly IGameHubNetworkManager _gameHub;
+        private readonly PlayerPhysicsSettings _playerPhysicsSettings;
+        private readonly IProximityService _proximityService;
+
         private IPhysicsController _physicsController;
+        private bool _isCheckingTarget;
+
+        public LocalPlayerController(IGameHubNetworkManager gameHub,
+                                     PlayerPhysicsSettings playerPhysicsSettings,
+                                     IInputManager inputManager,
+                                     IProximityService proximityService)
+        {
+            _gameHub = gameHub;
+            _playerPhysicsSettings = playerPhysicsSettings;
+            _inputManager = inputManager;
+            _proximityService = proximityService;
+        }
 
         public override void Create(TransformData transformData)
         {
@@ -56,8 +70,30 @@ namespace App.SubDomains.Game.SubDomains.PlayerController.Scripts.Controller
             {
                 _gameHub.MoveAsync(view.Position, view.Rotation).Forget();
             }
+
+            CheckForTarget();
         }
         
+        private void CheckForTarget()
+        {
+            if (_isCheckingTarget)
+            {
+                return;
+            }
+
+            _isCheckingTarget = true;
+
+            try
+            {
+                var target = _proximityService.GetNearbyTarget(view.transform, view.transform.position, 100);
+                UpdateTarget(target ? target : null);
+            }
+            finally
+            {
+                _isCheckingTarget = false;
+            }
+        }
+
         private void SetLookAtTarget()
         {
             _gameHub.TargetChangedAsync("Test").Forget();

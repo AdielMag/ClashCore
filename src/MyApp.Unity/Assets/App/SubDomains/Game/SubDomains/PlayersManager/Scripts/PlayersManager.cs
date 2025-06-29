@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 
+using App.SubDomains.Game.Scripts.Interface;
 using App.SubDomains.Game.SubDomains.PlayerController.Scripts.Controller;
 using App.SubDomains.Game.SubDomains.PlayerController.Scripts.@interface;
 
@@ -24,17 +25,19 @@ namespace App.SubDomains.Game.SubDomains.PlayersManager
         }
         
         private readonly IObjectResolver _resolver;
-        
         private readonly Dictionary<string, IPlayerController> _playersControllers = new();
-
+        private readonly IProximityService _proximityService;
         private Transform testTransform;
 
-        public PlayersManager(IObjectResolver resolver)
+        public PlayersManager(IObjectResolver resolver, IProximityService proximityService)
         {
             _resolver = resolver;
+            _proximityService = proximityService;
+            
             testTransform = new GameObject("TestTarget").transform;
             testTransform.position = UnityEngine.Vector3.zero;
             testTransform.rotation = UnityEngine.Quaternion.identity;
+            proximityService.RegisterTransform(testTransform);
         }
 
         public void OnPlayerJoined(TransformData transformData, bool isRemote)
@@ -51,6 +54,7 @@ namespace App.SubDomains.Game.SubDomains.PlayersManager
             }
 
             _playersControllers[transformData.Id] = controller;
+            _proximityService.RegisterTransform(controller.ViewGameObject.transform);
         }
         
         public void OnPlayerLeft(string id)
@@ -58,6 +62,7 @@ namespace App.SubDomains.Game.SubDomains.PlayersManager
             var controller = _playersControllers[id];
             controller.Dispose();
             _playersControllers.Remove(id);
+            _proximityService.UnregisterTransform(controller.ViewGameObject.transform);
         }
 
         public void OnPlayerMoved(string id, Vector3 position, Quaternion rotation)
@@ -75,11 +80,6 @@ namespace App.SubDomains.Game.SubDomains.PlayersManager
             if (! _playersControllers.TryGetValue(playerId, out var controller) ||
                 ! _playersControllers.TryGetValue(targetId, out var targetController))
             {
-                if (targetId == "Test")
-                {
-                    controller.UpdateTarget(testTransform);
-                }
-                
                 return;
             }
 

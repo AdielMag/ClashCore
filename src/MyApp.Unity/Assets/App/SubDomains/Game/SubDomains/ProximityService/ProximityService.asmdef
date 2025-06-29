@@ -1,0 +1,8 @@
+﻿{
+  "name": "ProximityService",
+  "references": ["App", "Game","MyApp.Shared.Unity", "UniTask", "VContainer","Unity.Burst","Unity.Mathematics"],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "autoReferenced": true
+}

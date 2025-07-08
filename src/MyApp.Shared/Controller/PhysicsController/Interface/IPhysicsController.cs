@@ -9,7 +9,8 @@ namespace Shared.Controller.PhysicsController.Interface
                    float         moveSpeed,
                    float         rotationSpeedDeg,
                    Curve         accelerationCurve = null,
-                   Curve         decelerationCurve = null);
+                   Curve         decelerationCurve = null,
+                   float cameraAngleOffsetDeg = 0f);
 
         PositionChangedEventData Move(Vector2 normalizedInput, float deltaTime);
         RotationChangedData Rotate(Vector2 normalizedInput, float deltaTime);

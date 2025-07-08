@@ -36,28 +36,29 @@ namespace Shared.Controller.PhysicsController.Controller
         private Vector3 _velocity;
         private bool _grounded;
 
-        private readonly PositionChangedEventData _positionData = new PositionChangedEventData();
-        private readonly RotationChangedData _rotationArgs = new RotationChangedData();
-        
+        private readonly PositionChangedEventData _positionData = new ();
+        private readonly RotationChangedData _rotationArgs = new ();
+        private float _cameraAngleOffsetRad = 0f;
 
         /* ───────────────────────── INITIALISE ───────────────────────── */
         public void Setup(ITransformable transform,
                           float moveSpeed,
                           float rotationSpeedDeg,
                           Curve ? accelerationCurve = null,
-                          Curve ? decelerationCurve = null)
+                          Curve ? decelerationCurve = null,
+                          float cameraAngleOffsetDeg = 0f)
         {
             _transform = transform ?? throw new ArgumentNullException(nameof(transform));
             _moveSpeed = moveSpeed;
             _rotSpeedRad = rotationSpeedDeg * _kDeg2Rad;
             _accelCurve = accelerationCurve ?? Curve.Linear01;
             _decelCurve = decelerationCurve ?? Curve.Linear01;
-
             _velocity = Vector3.Zero;
             _grounded = true;
             _curveTimer = 0f;
             _speedFactor = 0f;
             _accelerating = false;
+            _cameraAngleOffsetRad = cameraAngleOffsetDeg * _kDeg2Rad;
         }
 
         /* ───────────────────────── PUBLIC API ───────────────────────── */
@@ -89,9 +90,9 @@ namespace Shared.Controller.PhysicsController.Controller
 
             _speedFactor = Math.Max(_speedFactor, 0f);
 
-            // Desired horizontal velocity
-            var desiredDir = hasInput ? Vector3.Normalize(new Vector3(input.X, 0f, input.Y)) : Vector3.Zero;
-
+            // Apply camera angle offset to input direction
+            Vector2 rotatedInput = hasInput ? RotateVector2(input, _cameraAngleOffsetRad) : Vector2.Zero;
+            var desiredDir = hasInput ? Vector3.Normalize(new Vector3(rotatedInput.X, 0f, rotatedInput.Y)) : Vector3.Zero;
             var desiredHorVel = desiredDir * (_moveSpeed * _speedFactor);
 
             // Preserve vertical velocity / gravity
@@ -129,14 +130,16 @@ namespace Shared.Controller.PhysicsController.Controller
             var passedRotationThreshold = input.LengthSquared() > _kEpsilonSq;
             if (passedRotationThreshold)
             {
-                var targetYaw = MathF.Atan2(input.X, input.Y);
+                // Apply camera angle offset to input direction
+                Vector2 rotatedInput = RotateVector2(input, _cameraAngleOffsetRad);
+                var targetYaw = MathF.Atan2(rotatedInput.X, rotatedInput.Y);
                 var currentYaw = GetYawRad(_transform.Rotation);
                 var delta = Normalise(targetYaw - currentYaw);
 
                 var maxStep = _rotSpeedRad * dt;
                 var step = MathF.Abs(delta) <= maxStep ? delta : MathF.Sign(delta) * maxStep;
 
-                if (! (MathF.Abs(step) <= 1e-6f))
+                if (!(MathF.Abs(step) <= 1e-6f))
                 {
                     var oldRot = _transform.Rotation;
                     var newRot = YawQuat(currentYaw + step);
@@ -190,6 +193,16 @@ namespace Shared.Controller.PhysicsController.Controller
         public void Dispose()
         {
             _transform = null;
+        }
+        
+        private static Vector2 RotateVector2(Vector2 v, float angleRad)
+        {
+            var cos = MathF.Cos(angleRad);
+            var sin = MathF.Sin(angleRad);
+            return new Vector2(
+                v.X * cos - v.Y * sin,
+                v.X * sin + v.Y * cos
+            );
         }
     }
 }

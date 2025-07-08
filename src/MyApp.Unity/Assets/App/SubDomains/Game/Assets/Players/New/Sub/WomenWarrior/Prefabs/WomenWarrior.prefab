@@ -53,11 +53,11 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: -5324531855699944674, guid: 600730e98f3913643b70a25adb5ccbd3, type: 3}
-      propertyPath: m_Materials.Array.data[0]
+      propertyPath: 'm_Materials.Array.data[0]'
       value: 
       objectReference: {fileID: 2100000, guid: c42ffc4e7474107418ba0faaea579b6c, type: 2}
     - target: {fileID: -5324531855699944674, guid: 600730e98f3913643b70a25adb5ccbd3, type: 3}
-      propertyPath: m_Materials.Array.data[1]
+      propertyPath: 'm_Materials.Array.data[1]'
       value: 
       objectReference: {fileID: 2100000, guid: c42ffc4e7474107418ba0faaea579b6c, type: 2}
     - target: {fileID: 919132149155446097, guid: 600730e98f3913643b70a25adb5ccbd3, type: 3}
@@ -103,4 +103,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   animator: {fileID: 3943225665640127417}
-  smoothTime: 0.075
+  smoothTime: 0.03

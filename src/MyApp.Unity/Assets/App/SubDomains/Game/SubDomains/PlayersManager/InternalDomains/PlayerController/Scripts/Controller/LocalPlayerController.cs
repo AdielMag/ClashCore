@@ -1,5 +1,6 @@
 using App.SubDomains.Game.Scripts.Interface;
 using App.SubDomains.Game.Scripts.Utils;
+using App.SubDomains.Game.SubDomains.CameraManager.Scripts;
 using App.SubDomains.Game.SubDomains.GameNetworkHub;
 using App.SubDomains.Game.SubDomains.InputManager.Scripts;
 using App.SubDomains.Game.SubDomains.PlayerController.Scripts.ScriptableObjects;
@@ -21,19 +22,22 @@ namespace App.SubDomains.Game.SubDomains.PlayerController.Scripts.Controller
         private readonly IGameHubNetworkManager _gameHub;
         private readonly PlayerPhysicsSettings _playerPhysicsSettings;
         private readonly IProximityService _proximityService;
-
+        private readonly ICameraManager _cameraManager;
+        
         private IPhysicsController _physicsController;
         private bool _isCheckingTarget;
 
         public LocalPlayerController(IGameHubNetworkManager gameHub,
                                      PlayerPhysicsSettings playerPhysicsSettings,
                                      IInputManager inputManager,
-                                     IProximityService proximityService)
+                                     IProximityService proximityService,
+                                     ICameraManager cameraManager)
         {
             _gameHub = gameHub;
             _playerPhysicsSettings = playerPhysicsSettings;
             _inputManager = inputManager;
             _proximityService = proximityService;
+            _cameraManager = cameraManager;
         }
 
         public override void Create(TransformData transformData)
@@ -46,11 +50,13 @@ namespace App.SubDomains.Game.SubDomains.PlayerController.Scripts.Controller
             var accelerationCurve = _playerPhysicsSettings.AccelerationCurve.ToPhysicsCurve();
             var decelerationCurve = _playerPhysicsSettings.DecelerationCurve.ToPhysicsCurve();
 
+            var cameraAngle = _cameraManager.GetCameraAngleOffsetDeg();
             _physicsController.Setup(view,
                                      _playerPhysicsSettings.Speed,
                                      _playerPhysicsSettings.RotationSpeed,
                                      accelerationCurve,
-                                     decelerationCurve);
+                                     decelerationCurve,
+                                     cameraAngle);
         }
 
         public override void LateTick()
@@ -83,7 +89,7 @@ namespace App.SubDomains.Game.SubDomains.PlayerController.Scripts.Controller
 
             try
             {
-                var target = _proximityService.GetNearbyTarget(view.transform, view.transform.position, 100);
+                var target = _proximityService.GetNearbyTarget(view.transform, view.transform.position, 15);
                 UpdateTarget(target ? target : null);
 
                 var targetMoveSpeed =

@@ -32,7 +32,7 @@ public class ScenesInProjectWindow : EditorWindow
 
     private void RefreshSceneList()
     {
-        _scenePaths = AssetDatabase.FindAssets("t:Scene")
+        _scenePaths = AssetDatabase.FindAssets("t:Scene", new[] { "Assets" })
                                    .Select(AssetDatabase.GUIDToAssetPath)
                                    .OrderBy(path => Path.GetFileNameWithoutExtension(path))
                                    .ToList();

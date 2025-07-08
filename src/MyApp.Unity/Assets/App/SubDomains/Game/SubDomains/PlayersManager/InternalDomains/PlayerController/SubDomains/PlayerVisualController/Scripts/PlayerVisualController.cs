@@ -42,6 +42,10 @@ namespace App.SubDomains.Game.SubDomains.MovementAnimator.Scripts
         // LateUpdate delegate (switched at runtime)
         private Action _lateUpdateAction;
 
+        // Persistent velocity fields for smoothing
+        private float _verticalVelocity;
+        private float _horizontalVelocity;
+
         private void Awake()
         {
             _initialLocalRotation = transform.localRotation;
@@ -103,8 +107,12 @@ namespace App.SubDomains.Game.SubDomains.MovementAnimator.Scripts
         /*──────────────────── Has target → Strafe ──────────────────*/
         private void UpdateLookAtAndStrafeParameters()
         {
-            if (_lookAtTarget == null) return;
+            if (_lookAtTarget == null || Time.deltaTime <= 0f) return;
 
+            /* Calculate movement delta BEFORE rotation to maintain consistency */
+            Vector3 currentPos = transform.position;
+            _movementDelta = currentPos - _lastPosition;
+    
             /* 1) Rotate the visual to face the target (Y-axis only) */
             Vector3 toTarget = _lookAtTarget.position - transform.position;
             toTarget.y = 0f;
@@ -112,22 +120,20 @@ namespace App.SubDomains.Game.SubDomains.MovementAnimator.Scripts
                 transform.rotation = Quaternion.LookRotation(toTarget.normalized, Vector3.up);
 
             /* 2) Compute movement relative to the new facing direction */
-            Vector3 currentPos  = transform.position;
-            _movementDelta      = currentPos - _lastPosition;
-            Vector3 localDelta  = transform.InverseTransformDirection(_movementDelta);
+            Vector3 localDelta = transform.InverseTransformDirection(_movementDelta);
 
-            float rawForward    = localDelta.z / Time.deltaTime;
-            float rawSide       = localDelta.x / Time.deltaTime;
+            float rawForward = localDelta.z / Time.deltaTime;
+            float rawSide = localDelta.x / Time.deltaTime;
 
-            float targetVert    = Mathf.Clamp(rawForward / _playerPhysicsSettings.LookAtSpeed, -1f, 1f);
-            float targetHoriz   = Mathf.Clamp(rawSide    / _playerPhysicsSettings.LookAtSpeed, -1f, 1f);
+            float targetVert = Mathf.Clamp(rawForward / _playerPhysicsSettings.LookAtSpeed, -1f, 1f);
+            float targetHoriz = Mathf.Clamp(rawSide / _playerPhysicsSettings.LookAtSpeed, -1f, 1f);
 
-            float vertVel  = 0f, horizVel = 0f;
-            float currentVert  = Mathf.SmoothDamp(animator.GetFloat(_sVerticalHash),  targetVert,  ref vertVel,  smoothTime);
-            float currentHoriz = Mathf.SmoothDamp(animator.GetFloat(_sHorizontalHash), targetHoriz, ref horizVel, smoothTime);
+            // Use persistent velocity fields for correct smoothing
+            float currentVert = Mathf.SmoothDamp(animator.GetFloat(_sVerticalHash), targetVert, ref _verticalVelocity, smoothTime);
+            float currentHoriz = Mathf.SmoothDamp(animator.GetFloat(_sHorizontalHash), targetHoriz, ref _horizontalVelocity, smoothTime);
 
-            animator.SetFloat(_sVerticalHash,   currentVert);   // Forward / Back
-            animator.SetFloat(_sHorizontalHash, currentHoriz);  // Left / Right
+            animator.SetFloat(_sVerticalHash, currentVert);
+            animator.SetFloat(_sHorizontalHash, currentHoriz);
 
             _lastPosition = currentPos;
         }

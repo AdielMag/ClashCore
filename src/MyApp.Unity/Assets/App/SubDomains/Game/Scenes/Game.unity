@@ -538,6 +538,14 @@ PrefabInstance:
     m_TransformParent: {fileID: 1676724549}
     m_Modifications:
     - target: {fileID: 6824933665073061846, guid: a302a90653ada4b44bf03be5590a105c, type: 3}
+      propertyPath: m_HDR
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6824933665073061846, guid: a302a90653ada4b44bf03be5590a105c, type: 3}
+      propertyPath: m_AllowMSAA
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6824933665073061846, guid: a302a90653ada4b44bf03be5590a105c, type: 3}
       propertyPath: m_ClearFlags
       value: 2
       objectReference: {fileID: 0}

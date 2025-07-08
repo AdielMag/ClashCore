@@ -79,7 +79,6 @@ crashlytics-build.properties
 **/project.nuget.cache
 *rider.project*
 *.vscode
-**/Packages/
 /*.csproj
 
 # Additional ignored folders

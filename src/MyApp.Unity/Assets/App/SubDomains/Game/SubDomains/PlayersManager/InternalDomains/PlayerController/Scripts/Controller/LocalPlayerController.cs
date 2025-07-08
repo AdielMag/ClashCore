@@ -51,8 +51,6 @@ namespace App.SubDomains.Game.SubDomains.PlayerController.Scripts.Controller
                                      _playerPhysicsSettings.RotationSpeed,
                                      accelerationCurve,
                                      decelerationCurve);
-
-            SetLookAtTarget();
         }
 
         public override void LateTick()
@@ -87,17 +85,15 @@ namespace App.SubDomains.Game.SubDomains.PlayerController.Scripts.Controller
             {
                 var target = _proximityService.GetNearbyTarget(view.transform, view.transform.position, 100);
                 UpdateTarget(target ? target : null);
+
+                var targetMoveSpeed =
+                    target ? _playerPhysicsSettings.LookAtSpeed : _playerPhysicsSettings.Speed;
+                _physicsController.SetMoveSpeed(targetMoveSpeed);
             }
             finally
             {
                 _isCheckingTarget = false;
             }
-        }
-
-        private void SetLookAtTarget()
-        {
-            _gameHub.TargetChangedAsync("Test").Forget();
-            _physicsController.SetMoveSpeed(_playerPhysicsSettings.LookAtSpeed);
         }
         
         public override void Dispose()

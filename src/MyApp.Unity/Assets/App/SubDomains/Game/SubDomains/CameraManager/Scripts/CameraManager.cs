@@ -32,8 +32,8 @@ namespace App.SubDomains.Game.SubDomains.CameraManager.Scripts
 
         public float GetCameraAngleOffsetDeg()
         {
-            Vector3 offset = _transposer.m_FollowOffset;
-            float angle = -Mathf.Atan2(-offset.x, -offset.z) * Mathf.Rad2Deg;
+            var offset = _transposer.m_FollowOffset;
+            var angle = -Mathf.Atan2(-offset.x, -offset.z) * Mathf.Rad2Deg;
             return angle;
         }
     }

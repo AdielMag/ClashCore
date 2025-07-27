@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
 namespace Server.Helpers
@@ -13,6 +14,11 @@ namespace Server.Helpers
         public static WebApplicationBuilder ConfigureSecureKestrel<T>(this WebApplicationBuilder builder,
                                                                       KestrelSecureOptions options = null)
         {
+            if (builder.Environment.IsProduction() || builder.Environment.IsStaging())
+            {
+                return builder;
+            }
+            
             var logger = builder.Services.BuildServiceProvider().GetRequiredService<ILogger<T>>();
 
             builder.WebHost.ConfigureKestrel(serverOptions =>

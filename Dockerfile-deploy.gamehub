@@ -1,0 +1,22 @@
+﻿# ────────── Build Stage ──────────
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+WORKDIR /src
+
+# Copy solution and restore
+COPY . .
+RUN dotnet restore ./MyApp.sln
+
+# Publish only gamehub target
+RUN dotnet publish ./src/MyApp.Server.GameHub/MyApp.Server.GameHub.csproj -c Release -o /app/out
+
+# ────────── Runtime Stage ──────────
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
+WORKDIR /app
+COPY --from=build /app/out .
+
+EXPOSE 12346
+ENV ASPNETCORE_URLS=http://+:12346
+ENV ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT}
+ENV MONGO_DB_CONNECTION_STRING=${MONGO_DB_CONNECTION_STRING}
+
+ENTRYPOINT ["dotnet", "MyApp.Server.GameHub.dll"]

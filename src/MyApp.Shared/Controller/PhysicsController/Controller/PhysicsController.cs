@@ -36,8 +36,8 @@ namespace Shared.Controller.PhysicsController.Controller
         private Vector3 _velocity;
         private bool _grounded;
 
-        private readonly PositionChangedEventData _positionData = new ();
-        private readonly RotationChangedData _rotationArgs = new ();
+        private readonly PositionChangedEventData _positionData = new PositionChangedEventData();
+        private readonly RotationChangedData _rotationArgs = new RotationChangedData();
         private float _cameraAngleOffsetRad = 0f;
 
         /* ───────────────────────── INITIALISE ───────────────────────── */

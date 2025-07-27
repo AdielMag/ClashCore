@@ -1,6 +1,4 @@
-﻿using System;
-
-using UnityEditor;
+﻿using UnityEditor;
 using UnityEngine.UIElements;
 
 namespace App.Scripts.Editor.EnvironmentCreator

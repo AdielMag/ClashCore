@@ -14,12 +14,12 @@ namespace App.Scripts.Editor.EnvironmentCreator
 
         protected override void Configure(IContainerBuilder builder)
         {
-            builder.Register<Test>(Lifetime.Singleton).AsSelf();
+            builder.Register<EnvironmentCreatorController>(Lifetime.Singleton).AsImplementedInterfaces();
             
-            builder.RegisterBuildCallback(resolver =>
+            /*builder.RegisterBuildCallback(resolver =>
             {
                 resolver.Resolve<Test>();
-            });
+            })*/;
         }
     }
 }

@@ -1,10 +1,12 @@
 {
-    "name": "App_Edtior",
+    "name": "EnvironmentEditor",
     "rootNamespace": "",
     "references": [
         "GUID:b0214a6008ed146ff8f122a6a9c2f6cc",
         "GUID:f51ebe6a0ceec4240a699833d6309b23",
-        "GUID:eeb0c2632dc942b4a851016966687b2f"
+        "GUID:eeb0c2632dc942b4a851016966687b2f",
+        "GUID:38b754abbe6d8284ea940a7170e25f95",
+        "GUID:ceecc0ad2c88f174889dba5196dad5aa"
     ],
     "includePlatforms": [
         "Editor"

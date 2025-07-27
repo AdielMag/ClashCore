@@ -7,6 +7,13 @@
       "dependencies": {},
       "hash": "e98cb18702ec61457b051aad8a1862eab4f70b4e"
     },
+    "com.boristhebrave.sylves": {
+      "version": "https://github.com/BorisTheBrave/sylves.git#upm",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {},
+      "hash": "9f4e5e5575c0843f144dc8b00a88567509fcaee7"
+    },
     "com.cysharp.magiconion.client.unity": {
       "version": "https://github.com/Cysharp/MagicOnion.git?path=src/MagicOnion.Client.Unity/Assets/Scripts/MagicOnion.Client.Unity",
       "depth": 0,

@@ -4,7 +4,7 @@ WORKDIR /src
 
 # Copy solution and restore
 COPY . .
-RUN dotnet restore ./MyApp.sln
+RUN dotnet restore ./src/MyApp.Server.GameHub/MyApp.Server.GameHub.csproj
 
 # Publish only gamehub target
 RUN dotnet publish ./src/MyApp.Server.GameHub/MyApp.Server.GameHub.csproj -c Release -o /app/out

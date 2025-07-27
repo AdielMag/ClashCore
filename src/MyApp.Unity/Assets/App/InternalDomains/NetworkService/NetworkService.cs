@@ -57,7 +57,7 @@ namespace App.InternalDomains.NetworkService
         
         private void CreateServicesChannel()
         {
-            _servicesChannel = GrpcChannelx.ForTarget(new GrpcChannelTarget("localhost", 5002, false));
+            _servicesChannel = GrpcChannelx.ForTarget(new GrpcChannelTarget("clashcore-services.onrender.com", 5002, false));
         }
         
         public void CreateMatchChannel(string url, int port)

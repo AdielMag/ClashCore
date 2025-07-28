@@ -1,0 +1,13 @@
+app = "clashcore"  # Will match the name you use in `fly launch` or dashboard
+
+primary_region = "ams"
+
+[build]
+dockerfile = "Dockerfile-deploy.services"  # or Dockerfile-deploy.server / gamehub
+
+[http_service]
+internal_port = 5002
+force_https = true
+auto_stop_machines = true
+auto_start_machines = true
+processes = ["app"]

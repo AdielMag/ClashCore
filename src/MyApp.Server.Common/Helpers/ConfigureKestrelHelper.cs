@@ -14,20 +14,18 @@ namespace Server.Helpers
         public static WebApplicationBuilder ConfigureSecureKestrel<T>(this WebApplicationBuilder builder,
                                                                       KestrelSecureOptions options = null)
         {
-
-            
             var logger = builder.Services.BuildServiceProvider().GetRequiredService<ILogger<T>>();
 
             builder.WebHost.ConfigureKestrel(serverOptions =>
             {
                 serverOptions.ListenAnyIP(options.HttpsPort, listenOptions =>
                 {
-                    listenOptions.Protocols = HttpProtocols.Http2;
-                    
                     if (builder.Environment.IsProduction() || builder.Environment.IsStaging())
                     {
-                        return;
+                        return ;
                     }
+                    
+                    listenOptions.Protocols = HttpProtocols.Http2;
                     try
                     {
                         var cert = new X509Certificate2(

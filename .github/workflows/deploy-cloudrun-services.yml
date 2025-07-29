@@ -70,4 +70,4 @@ jobs:
             --allow-unauthenticated \
             --use-http2 \
             --service-account=${{ env.RUNTIME_SA }}
-            --update-env-vars="MONGO_DB_CONNECTION_STRING=${{ secrets.MONGO_DB_CONNECTION_STRING }}" \
+            --set-env-vars=MONGO_DB_CONNECTION_STRING=${{ secrets.MONGO_DB_CONNECTION_STRING }}

@@ -14,11 +14,10 @@ namespace Server
             var builder = WebApplication.CreateBuilder(args);
 
             builder.Services.ConfigureMagicOnion();
-            var port = Environment.GetEnvironmentVariable("PORT") ?? "12346";
 
             builder.ConfigureSecureKestrel<Program>(new KestrelSecureOptions
             {
-                HttpsPort = int.Parse(port)
+                HttpsPort = 12346
             });
             builder.Services.AddMongoDb();
 

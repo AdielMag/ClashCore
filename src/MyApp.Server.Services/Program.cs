@@ -8,11 +8,10 @@ namespace Server
         private static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
-            var port = Environment.GetEnvironmentVariable("PORT") ?? "5002";
 
             builder.ConfigureSecureKestrel<Program>(new KestrelSecureOptions
             {
-                HttpsPort = int.Parse(port)
+                HttpsPort = 5002
             });
             
             builder.Services.AddMongoDb();

@@ -18,17 +18,20 @@ namespace Server.Helpers
 
             builder.WebHost.ConfigureKestrel(serverOptions =>
             {
-                serverOptions.ListenAnyIP(options.HttpsPort, listenOptions =>
+                // Always listen on the PORT environment variable in production
+                if (builder.Environment.IsProduction() || builder.Environment.IsStaging())
                 {
-                    listenOptions.Protocols = HttpProtocols.Http2;
+                    serverOptions.ListenAnyIP(options.HttpsPort, listenOptions =>
+                    {
+                        listenOptions.Protocols = HttpProtocols.Http1AndHttp2;
+                    });
+                }
+                else
+                {
+                    serverOptions.ListenAnyIP(options.HttpsPort, listenOptions =>
+                    {
+                        listenOptions.Protocols = HttpProtocols.Http2;
 
-                    if (builder.Environment.IsProduction() || builder.Environment.IsStaging())
-                    {
-                        return ;
-                    }
-                    
-                    try
-                    {
                         var cert = new X509Certificate2(
                             options.CertificatePath,
                             options.CertificatePassword,
@@ -37,14 +40,8 @@ namespace Server.Helpers
                             X509KeyStorageFlags.Exportable);
 
                         listenOptions.UseHttps(cert);
-                        logger.LogInformation("Listening securely on HTTPS port {Port}", options.HttpsPort);
-                    }
-                    catch (Exception ex)
-                    {
-                        logger.LogError(ex, "Failed to load certificate.");
-                        throw;
-                    }
-                });
+                    });
+                }
             });
 
             return builder;

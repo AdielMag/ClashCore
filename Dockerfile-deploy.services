@@ -11,8 +11,12 @@ FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
 WORKDIR /app
 COPY --from=build /app/out .
 
-ENV ASPNETCORE_URLS=http://+:${PORT}
+# Don't set ASPNETCORE_URLS - let Cloud Run handle this
+# Cloud Run will set PORT environment variable automatically
 ENV ASPNETCORE_ENVIRONMENT=Production
 ENV MONGO_DB_CONNECTION_STRING=${MONGO_DB_CONNECTION_STRING}
+
+# Make sure to expose the port (Cloud Run uses 8080 by default)
+EXPOSE 8080
 
 ENTRYPOINT ["dotnet", "MyApp.Server.Services.dll"]

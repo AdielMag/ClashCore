@@ -14,29 +14,32 @@ namespace Server.Helpers
         public static WebApplicationBuilder ConfigureSecureKestrel<T>(this WebApplicationBuilder builder,
                                                                       KestrelSecureOptions options = null)
         {
-            var logger = builder.Services.BuildServiceProvider().GetRequiredService<ILogger<T>>();
-
             builder.WebHost.ConfigureKestrel(serverOptions =>
             {
-                // Always listen on the PORT environment variable in production
+                // Cloud Run configuration
                 if (builder.Environment.IsProduction() || builder.Environment.IsStaging())
                 {
                     var port = GetPort(options);
 
                     serverOptions.ListenAnyIP(port, listenOptions =>
                     {
-                        listenOptions.Protocols = HttpProtocols.Http1AndHttp2;
+                        // Cloud Run terminates TLS, so use HTTP/2 without TLS
+                        listenOptions.Protocols = HttpProtocols.Http2;
+                        
+                        // Important: Don't use HTTPS - Cloud Run handles TLS termination
+                        // The internal connection between Cloud Run and your container is HTTP
                     });
                 }
                 else
                 {
-                    serverOptions.ListenAnyIP(options.HttpsPort, listenOptions =>
+                    // Local development with HTTPS
+                    serverOptions.ListenAnyIP(options?.HttpsPort ?? 5001, listenOptions =>
                     {
                         listenOptions.Protocols = HttpProtocols.Http2;
 
                         var cert = new X509Certificate2(
-                            options.CertificatePath,
-                            options.CertificatePassword,
+                            options?.CertificatePath ?? "/https/aspnetapp.pfx",
+                            options?.CertificatePassword ?? "a1234567",
                             X509KeyStorageFlags.MachineKeySet |
                             X509KeyStorageFlags.PersistKeySet |
                             X509KeyStorageFlags.Exportable);
@@ -53,22 +56,13 @@ namespace Server.Helpers
         {
             var envPort = Environment.GetEnvironmentVariable("PORT");
 
-            if (! string.IsNullOrEmpty(envPort) &&
-                int.TryParse(envPort, out var port))
+            if (!string.IsNullOrEmpty(envPort) && int.TryParse(envPort, out var port))
             {
                 return port;
             }
             
-            if (options is
-            {
-                HttpsPort: > 0
-            })
-            {
-                return options.HttpsPort;
-            }
-            
-            // Default port if not specified
-            return 443; // Default HTTPS port
+            // Cloud Run typically uses port 8080
+            return options?.HttpsPort ?? 8080;
         }
     }
 
@@ -76,6 +70,6 @@ namespace Server.Helpers
     {
         public string CertificatePath { get; set; } = "/https/aspnetapp.pfx";
         public string CertificatePassword { get; set; } = "a1234567";
-        public int HttpsPort { get; set; } = 443;
+        public int HttpsPort { get; set; } = 5001; // Changed from 443 to 5001 for local dev
     }
 }

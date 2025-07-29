@@ -15,12 +15,12 @@ env:
 
   # Clashcore Services
   SERVICES_IMAGE_NAME: clashcore-services
-  SERVICES_REPO_NAME: clashcore-services
+  SERVICES_REPO_NAME: clashcore
   SERVICES_SERVICE_NAME: clashcore-services
 
   # Gamehub Service
   GAMEHUB_IMAGE_NAME: clashcore-gamehub
-  GAMEHUB_REPO_NAME: clashcore-gamehub
+  GAMEHUB_REPO_NAME: clashcore
 
   RUNTIME_SA: cloudrun-runtime@clashcore.iam.gserviceaccount.com
 

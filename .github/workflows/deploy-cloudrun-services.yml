@@ -1,4 +1,4 @@
-name: Deploy Services to Cloud Run
+name: Deploy to Cloud Run
 
 on:
   push:
@@ -7,11 +7,18 @@ on:
   workflow_dispatch:
 
 env:
-  IMAGE_NAME: clashcore-services
   REGION: us-central1
   PROJECT_ID: clashcore
-  REPO_NAME: clashcore-services
-  SERVICE_NAME: clashcore-services
+
+  # Clashcore Services
+  SERVICES_IMAGE_NAME: clashcore-services
+  SERVICES_REPO_NAME: clashcore-services
+  SERVICES_SERVICE_NAME: clashcore-services
+
+  # Gamehub Service
+  GAMEHUB_IMAGE_NAME: clashcore-gamehub
+  GAMEHUB_REPO_NAME: clashcore-gamehub
+
   RUNTIME_SA: cloudrun-runtime@clashcore.iam.gserviceaccount.com
 
 jobs:
@@ -37,13 +44,14 @@ jobs:
         run: |
           gcloud auth configure-docker ${{ env.REGION }}-docker.pkg.dev
 
-      - name: Build Docker image
+      - name: Build clashcore-services Docker image
         run: |
-          docker build -f Dockerfile-deploy.services -t ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPO_NAME }}/${{ env.IMAGE_NAME }}:latest .
+          docker build -f Dockerfile-deploy.services \
+            -t ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.SERVICES_REPO_NAME }}/${{ env.SERVICES_IMAGE_NAME }}:latest .
 
-      - name: Push Docker image
+      - name: Push clashcore-services Docker image
         run: |
-          docker push ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPO_NAME }}/${{ env.IMAGE_NAME }}:latest
+          docker push ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.SERVICES_REPO_NAME }}/${{ env.SERVICES_IMAGE_NAME }}:latest
 
   deploy:
     runs-on: ubuntu-latest
@@ -61,13 +69,44 @@ jobs:
           project_id: ${{ env.PROJECT_ID }}
           install_components: "beta"
 
-      - name: Deploy to Cloud Run
+      - name: Deploy clashcore-services to Cloud Run
         run: |
-          gcloud run deploy ${{ env.SERVICE_NAME }} \
-            --image ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPO_NAME }}/${{ env.IMAGE_NAME }}:latest \
+          gcloud run deploy ${{ env.SERVICES_SERVICE_NAME }} \
+            --image ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.SERVICES_REPO_NAME }}/${{ env.SERVICES_IMAGE_NAME }}:latest \
             --platform managed \
             --region ${{ env.REGION }} \
             --allow-unauthenticated \
             --use-http2 \
             --service-account=${{ env.RUNTIME_SA }} \
             --set-env-vars=MONGO_DB_CONNECTION_STRING=${{ secrets.MONGO_DB_CONNECTION_STRING }}
+
+  build-gamehub-image:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+      - name: Set up gcloud CLI
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          project_id: ${{ env.PROJECT_ID }}
+          install_components: "beta"
+
+      - name: Configure Docker to use Artifact Registry
+        run: |
+          gcloud auth configure-docker ${{ env.REGION }}-docker.pkg.dev
+
+      - name: Build clashcore-gamehub Docker image
+        run: |
+          docker build -f Dockerfile-deploy.gamehub \
+            -t ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.GAMEHUB_REPO_NAME }}/${{ env.GAMEHUB_IMAGE_NAME }}:latest .
+
+      - name: Push clashcore-gamehub Docker image
+        run: |
+          docker push ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.GAMEHUB_REPO_NAME }}/${{ env.GAMEHUB_IMAGE_NAME }}:latest

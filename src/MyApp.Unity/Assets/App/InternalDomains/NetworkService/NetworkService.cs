@@ -47,40 +47,90 @@ namespace App.InternalDomains.NetworkService
                 HttpHandler = new YetAnotherHttpHandler
                 {
                     Http2Only = true,
-                    Http2KeepAliveInterval = TimeSpan.FromSeconds(60),
-                    Http2KeepAliveTimeout = TimeSpan.FromSeconds(30),
+                    Http2KeepAliveInterval = TimeSpan.FromSeconds(30), // Reduced from 60
+                    Http2KeepAliveTimeout = TimeSpan.FromSeconds(15),  // Reduced from 30
                 },
-                DisposeHttpClient = true
+                DisposeHttpClient = true,
+                // Add retry policy
+                ServiceConfig = new Grpc.Net.Client.Configuration.ServiceConfig
+                {
+                    MethodConfigs =
+                    {
+                        new Grpc.Net.Client.Configuration.MethodConfig
+                        {
+                            Names = { Grpc.Net.Client.Configuration.MethodName.Default },
+                            RetryPolicy = new Grpc.Net.Client.Configuration.RetryPolicy
+                            {
+                                MaxAttempts = 3,
+                                InitialBackoff = TimeSpan.FromSeconds(1),
+                                MaxBackoff = TimeSpan.FromSeconds(5),
+                                BackoffMultiplier = 1.5,
+                                RetryableStatusCodes = { Grpc.Core.StatusCode.Unavailable }
+                            }
+                        }
+                    }
+                }
             }));
         }
         
         private void CreateServicesChannel()
         {
-            _servicesChannel = GrpcChannelx.ForTarget(new GrpcChannelTarget("clashcore.onrender.com/", 10000, false));
+            try
+            {
+                _servicesChannel = GrpcChannelx.ForAddress("https://clashcore-services-280011189315.us-central1.run.app");
+                _debugService?.Log("Services channel created successfully");
+            }
+            catch (Exception ex)
+            {
+                _debugService?.LogError($"Failed to create services channel: {ex.Message}");
+                throw;
+            }
         }
         
         public void CreateMatchChannel(string url, int port)
         {
-            _matchChannel = GrpcChannelx.ForTarget(new GrpcChannelTarget(url, port, false));
+            try
+            {
+                _matchChannel = GrpcChannelx.ForTarget(new GrpcChannelTarget(url, port, false));
+                _debugService?.Log("Match channel created successfully");
+            }
+            catch (Exception ex)
+            {
+                _debugService?.LogError($"Failed to create match channel: {ex.Message}");
+                throw;
+            }
         }
 
         public async UniTask<TService> GetService<TService>() where TService : IService<TService>
         {
-            await UniTask.WaitUntil(() => _networkScope);
+            await UniTask.WaitUntil(() => _networkScope != null);
             return _networkScope.Container.Resolve<TService>();
         }
 
         public async UniTask<THub> ConnectHub<THub, THubReceiver>(THubReceiver receiver) where THub : IStreamingHub<THub, THubReceiver>
         {
+            if (_matchChannel == null)
+            {
+                throw new InvalidOperationException("Match channel not created. Call CreateMatchChannel first.");
+            }
+            
             var hubClient = await StreamingHubClient.ConnectAsync<THub, THubReceiver>(_matchChannel, receiver);
             return hubClient;
         }
         
         public void Dispose()
         {
-            _appLifetimeScope?.Dispose();
-            _servicesChannel?.Dispose();
-            _networkScope?.Dispose();
+            try
+            {
+                _servicesChannel?.Dispose();
+                _matchChannel?.Dispose();
+                _networkScope?.Dispose();
+                _debugService?.Log("NetworkService disposed successfully");
+            }
+            catch (Exception ex)
+            {
+                _debugService?.LogError($"Error disposing NetworkService: {ex.Message}");
+            }
         }
     }
 }

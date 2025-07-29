@@ -69,5 +69,5 @@ jobs:
             --region ${{ env.REGION }} \
             --allow-unauthenticated \
             --use-http2 \
-            --service-account=${{ env.RUNTIME_SA }}
+            --service-account=${{ env.RUNTIME_SA }} \
             --set-env-vars=MONGO_DB_CONNECTION_STRING=${{ secrets.MONGO_DB_CONNECTION_STRING }}

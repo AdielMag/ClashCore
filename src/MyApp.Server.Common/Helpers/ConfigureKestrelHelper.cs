@@ -20,12 +20,13 @@ namespace Server.Helpers
             {
                 serverOptions.ListenAnyIP(options.HttpsPort, listenOptions =>
                 {
+                    listenOptions.Protocols = HttpProtocols.Http2;
+
                     if (builder.Environment.IsProduction() || builder.Environment.IsStaging())
                     {
                         return ;
                     }
                     
-                    listenOptions.Protocols = HttpProtocols.Http2;
                     try
                     {
                         var cert = new X509Certificate2(

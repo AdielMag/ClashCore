@@ -2,11 +2,8 @@
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
-# Copy solution and restore
 COPY . .
 RUN dotnet restore ./src/MyApp.Server.Services/MyApp.Server.Services.csproj
-
-# Publish only services target
 RUN dotnet publish ./src/MyApp.Server.Services/MyApp.Server.Services.csproj -c Release -o /app/out
 
 # ────────── Runtime Stage ──────────
@@ -14,9 +11,8 @@ FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
 WORKDIR /app
 COPY --from=build /app/out .
 
-EXPOSE 5002
-ENV ASPNETCORE_URLS=http://+:5002
+ENV ASPNETCORE_URLS=http://+:${PORT}
 ENV ASPNETCORE_ENVIRONMENT=Production
-ENV MONGO_DB_CONNECTION_STRING=$MONGO_DB_CONNECTION_STRING
+ENV MONGO_DB_CONNECTION_STRING=${MONGO_DB_CONNECTION_STRING}
 
 ENTRYPOINT ["dotnet", "MyApp.Server.Services.dll"]

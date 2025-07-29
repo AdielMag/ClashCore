@@ -21,7 +21,9 @@ namespace Server.Helpers
                 // Always listen on the PORT environment variable in production
                 if (builder.Environment.IsProduction() || builder.Environment.IsStaging())
                 {
-                    serverOptions.ListenAnyIP(options.HttpsPort, listenOptions =>
+                    var port = GetPort(options);
+
+                    serverOptions.ListenAnyIP(port, listenOptions =>
                     {
                         listenOptions.Protocols = HttpProtocols.Http1AndHttp2;
                     });
@@ -45,6 +47,28 @@ namespace Server.Helpers
             });
 
             return builder;
+        }
+
+        private static int GetPort(KestrelSecureOptions options)
+        {
+            var envPort = Environment.GetEnvironmentVariable("PORT");
+
+            if (! string.IsNullOrEmpty(envPort) &&
+                int.TryParse(envPort, out var port))
+            {
+                return port;
+            }
+            
+            if (options is
+            {
+                HttpsPort: > 0
+            })
+            {
+                return options.HttpsPort;
+            }
+            
+            // Default port if not specified
+            return 443; // Default HTTPS port
         }
     }
 

@@ -120,6 +120,7 @@ namespace App.InternalDomains.NetworkService
         
         public void Dispose()
         {
+            
             try
             {
                 _servicesChannel?.Dispose();

@@ -14,7 +14,11 @@ namespace Server.Helpers
         public static IServiceCollection AddMongoDb(this IServiceCollection services)
         {
             var connectionUri = Environment.GetEnvironmentVariable("MONGO_DB_CONNECTION_STRING");
-
+            if (string.IsNullOrEmpty(connectionUri))
+            {
+                throw new InvalidOperationException("MongoDB connection string is not set in environment variables.");
+            }
+            
             services.AddSingleton<IMongoClient>(sp =>
             {
                 var settings = MongoClientSettings.FromConnectionString(connectionUri);

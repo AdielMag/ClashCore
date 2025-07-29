@@ -11,11 +11,10 @@ FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
 WORKDIR /app
 COPY --from=build /app/out .
 
-# Don't set ASPNETCORE_URLS - let Cloud Run handle this
-# Cloud Run will set PORT environment variable automatically
+# Only set environment variables that don't need secrets
 ENV ASPNETCORE_ENVIRONMENT=Production
-ENV MONGO_DB_CONNECTION_STRING=${MONGO_DB_CONNECTION_STRING}
 
+# Don't set MONGO_DB_CONNECTION_STRING here - pass it at runtime via Cloud Run
 # Make sure to expose the port (Cloud Run uses 8080 by default)
 EXPOSE 8080
 

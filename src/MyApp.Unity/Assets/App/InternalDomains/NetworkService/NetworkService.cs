@@ -49,7 +49,6 @@ namespace App.InternalDomains.NetworkService
                     Http2Only = true,
                     Http2KeepAliveInterval = TimeSpan.FromSeconds(60),
                     Http2KeepAliveTimeout = TimeSpan.FromSeconds(30),
-                    SkipCertificateVerification = true
                 },
                 DisposeHttpClient = true
             }));
@@ -57,7 +56,7 @@ namespace App.InternalDomains.NetworkService
         
         private void CreateServicesChannel()
         {
-            _servicesChannel = GrpcChannelx.ForTarget(new GrpcChannelTarget("https://clashcore-services.onrender.com", 443, false));
+            _servicesChannel = GrpcChannelx.ForTarget(new GrpcChannelTarget("clashcore.onrender.com/", 10000, false));
         }
         
         public void CreateMatchChannel(string url, int port)

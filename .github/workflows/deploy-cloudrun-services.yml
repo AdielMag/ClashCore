@@ -1,0 +1,45 @@
+name: Deploy Services to Cloud Run
+
+on:
+  push:
+    branches:
+      - main  # or master
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v4
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+      - name: Configure Docker to use GCR
+        run: gcloud auth configure-docker
+
+      - name: Setup gcloud CLI
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
+          install_components: 'beta'
+
+      - name: Build Docker image for Services
+        run: |
+          docker build -f src/Dockerfile-deploy.services -t gcr.io/${{ secrets.GCP_PROJECT_ID }}/clashcore-services:latest .
+
+      - name: Push Docker image to GCR
+        run: |
+          docker push gcr.io/${{ secrets.GCP_PROJECT_ID }}/clashcore-services:latest
+
+      - name: Deploy to Cloud Run
+        run: |
+          gcloud run deploy clashcore-services \
+            --image gcr.io/${{ secrets.GCP_PROJECT_ID }}/clashcore-services:latest \
+            --platform managed \
+            --region ${{ secrets.GCP_REGION }} \
+            --allow-unauthenticated \
+            --use-http2

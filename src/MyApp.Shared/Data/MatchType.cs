@@ -1,4 +1,4 @@
-﻿namespace Shared.Data
+namespace Shared.Data
 {
     public enum MatchType
     {

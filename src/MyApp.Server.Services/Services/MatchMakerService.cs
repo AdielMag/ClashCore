@@ -12,8 +12,10 @@ using Server.Mongo.Entity;
 
 using Shared.Data;
 using Shared.Services;
-using System.Text.Json;
+using System;
 using System.Collections.Generic;
+using System.Text.Json;
+using System.Threading.Tasks;
 
 using MatchType = Shared.Data.MatchType;
 
@@ -148,10 +150,11 @@ namespace Server.Services
             var url = instance.Url;
             var port = instance.Port;
 
-            var match = await _matches.CreateMatchAsync(new()
-            {
-                playerId
-            }, type, url, port);
+            var match = await _matches.CreateMatchAsync(
+                new List<string> { playerId },
+                type,
+                url,
+                port);
 
             return match;
         }

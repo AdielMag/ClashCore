@@ -1,11 +1,10 @@
-using Common.Mongo.Collection;
-
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
 using MongoDB.Driver;
 
 using Server.Mongo.Collection;
+using Common.Mongo.Collection;
 
 namespace Server.Helpers
 {
@@ -45,7 +44,21 @@ namespace Server.Helpers
                 var logger = sp.GetRequiredService<ILogger<MatchCollection>>();
                 return new MatchCollection(database, logger);
             });
-            
+
+            services.AddSingleton<IConfigsCollection>(sp =>
+            {
+                var database = sp.GetRequiredService<IMongoDatabase>();
+                var logger = sp.GetRequiredService<ILogger<ConfigsCollection>>();
+                return new ConfigsCollection(database, logger);
+            });
+
+            services.AddSingleton<IMatchInstanceCollection>(sp =>
+            {
+                var database = sp.GetRequiredService<IMongoDatabase>();
+                var logger = sp.GetRequiredService<ILogger<MatchInstanceCollection>>();
+                return new MatchInstanceCollection(database, logger);
+            });
+
             return services;
         }
     }

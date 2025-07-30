@@ -20,10 +20,11 @@ namespace Server
 
             // Configure MagicOnion with proper gRPC settings
             builder.Services.ConfigureMagicOnion();
-            
+
             // Add your services
             builder.Services.AddScoped<PlayersService>();
             builder.Services.AddScoped<MatchMakerService>();
+            builder.Services.AddSingleton<MatchInstanceService>();
             
             var app = builder.Build();
             

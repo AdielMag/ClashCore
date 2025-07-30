@@ -68,9 +68,9 @@ namespace Server.Services
                 }
             };
 
-            var op = await client.CreateServiceAsync(request);
-            var result = await op.PollUntilCompletedAsync();
-            var url = result.Result.Uri ?? string.Empty;
+            var operation = await client.CreateServiceAsync(request);
+            var completedOperation = await operation.PollUntilCompletedAsync();
+            var url = completedOperation.Result.Uri ?? string.Empty;
 
             return new MatchInstance
             {

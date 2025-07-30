@@ -56,13 +56,13 @@ namespace Server.Mongo.Collection
             }
         }
 
-        public async Task<MatchInstance> CreateInstanceAsync(MatchInstance instance)
+        public async Task<MatchInstance> CreateInstanceAsync(MatchInstance instanceData)
         {
             try
             {
-                instance.CreatedAt = DateTime.UtcNow;
-                await _collection.InsertOneAsync(instance);
-                return instance;
+                instanceData.CreatedAt = DateTime.UtcNow;
+                await _collection.InsertOneAsync(instanceData);
+                return instanceData;
             }
             catch (Exception ex)
             {

@@ -41,12 +41,12 @@ namespace Server.Services
             var projectId = Environment.GetEnvironmentVariable("GCP_PROJECT_ID") ?? "clashcore";
             var region = Environment.GetEnvironmentVariable("GCP_REGION") ?? "us-central1";
             var image = Environment.GetEnvironmentVariable("GAMEHUB_IMAGE") ??
-                         $"{region}-docker.pkg.dev/{projectId}/clashcore-gamehub/clashcore-gamehub:latest";
+                         $"{region}-docker.pkg.dev/{projectId}/clashcore-gamehub:latest";
 
             var parent = LocationName.FromProjectLocation(projectId, region);
             var serviceId = $"gamehub-{Guid.NewGuid():N}";
 
-            var port = 12346; // Example port, can be configured as needed
+            var port = 8080; // Example port, can be configured as needed
             var client = await ServicesClient.CreateAsync();
             var request = new CreateServiceRequest
             {

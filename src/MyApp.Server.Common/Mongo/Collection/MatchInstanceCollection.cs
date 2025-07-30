@@ -56,11 +56,17 @@ namespace Server.Mongo.Collection
             }
         }
 
-        public async Task<MatchInstance> CreateInstanceAsync(MatchInstance instanceData)
+        public async Task<MatchInstance> CreateInstanceAsync(string url, int port)
         {
             try
             {
-                instanceData.CreatedAt = DateTime.UtcNow;
+                var instanceData = new MatchInstance
+                {
+                    Url = url,
+                    Port = port,
+                    PlayerCount = 0,
+                    CreatedAt = DateTime.UtcNow
+                };
                 await _collection.InsertOneAsync(instanceData);
                 return instanceData;
             }

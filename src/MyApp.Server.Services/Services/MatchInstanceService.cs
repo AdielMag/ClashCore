@@ -33,7 +33,6 @@ namespace Server.Services
 
             instance = await ProvisionNewInstanceAsync();
             instance.PlayerCount = requiredSlots;
-            await _instances.CreateInstanceAsync(instance);
             return instance;
         }
 
@@ -47,6 +46,7 @@ namespace Server.Services
             var parent = LocationName.FromProjectLocation(projectId, region);
             var serviceId = $"gamehub-{Guid.NewGuid():N}";
 
+            var port = 12346; // Example port, can be configured as needed
             var client = await ServicesClient.CreateAsync();
             var request = new CreateServiceRequest
             {
@@ -61,7 +61,7 @@ namespace Server.Services
                             new Google.Cloud.Run.V2.Container
                             {
                                 Image = image,
-                                Ports = { new ContainerPort { ContainerPort_ = 12346 } }
+                                Ports = { new ContainerPort { ContainerPort_ = port } }
                             }
                         }
                     }
@@ -72,12 +72,7 @@ namespace Server.Services
             var completedOperation = await operation.PollUntilCompletedAsync();
             var url = completedOperation.Result.Uri ?? string.Empty;
 
-            return new MatchInstance
-            {
-                Url = url,
-                Port = 12346,
-                PlayerCount = 0
-            };
+            return await _instances.CreateInstanceAsync(url, port);
         }
     }
 }

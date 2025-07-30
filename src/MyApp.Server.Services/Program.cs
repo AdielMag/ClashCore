@@ -1,4 +1,4 @@
-﻿using Server.Helpers;
+using Server.Helpers;
 using Server.Services;
 
 namespace Server
@@ -14,29 +14,30 @@ namespace Server
             {
                 HttpsPort = 5002
             });
-            
+
             // Add MongoDB
             builder.Services.AddMongoDb();
 
             // Configure MagicOnion with proper gRPC settings
             builder.Services.ConfigureMagicOnion();
-            
+
             // Add your services
             builder.Services.AddScoped<PlayersService>();
             builder.Services.AddScoped<MatchMakerService>();
-            
+            builder.Services.AddSingleton<MatchInstanceService>();
+
             var app = builder.Build();
-            
+
             // Add health check endpoints for Cloud Run
             app.MapGet("/", () => "gRPC Server is running");
             app.MapGet("/health", () => "OK");
-            
+
             // Important: Enable routing before mapping services
             app.UseRouting();
-            
+
             // Map MagicOnion services
             app.MapMagicOnionService();
-            
+
             app.Run();
         }
     }

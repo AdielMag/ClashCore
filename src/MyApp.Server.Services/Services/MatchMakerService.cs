@@ -12,6 +12,10 @@ using Server.Mongo.Entity;
 
 using Shared.Data;
 using Shared.Services;
+using System;
+using System.Collections.Generic;
+using System.Text.Json;
+using System.Threading.Tasks;
 
 using MatchType = Shared.Data.MatchType;
 
@@ -21,15 +25,23 @@ namespace Server.Services
     {
         private readonly IMongoClient _mongoClient;
         private readonly IMatchCollection _matches;
+        private readonly IConfigsCollection _configs;
+        private readonly MatchInstanceService _instanceService;
         private readonly ILogger<MatchMakerService> _logger;
+
+        private Dictionary<MatchType, MatchConfig>? _matchConfigs;
 
         public MatchMakerService(IMongoClient mongoClient,
                                  ILogger<MatchMakerService> logger,
-                                 IMatchCollection matches)
+                                 IMatchCollection matches,
+                                 IConfigsCollection configs,
+                                 MatchInstanceService instanceService)
         {
             _mongoClient = mongoClient;
             _logger = logger;
             _matches = matches;
+            _configs = configs;
+            _instanceService = instanceService;
         }
 
         public UnaryResult<string> Test()
@@ -45,7 +57,8 @@ namespace Server.Services
             _logger.LogInformation(
                 $"Player {playerId} is trying to join match of type {matchType} with matchId {matchId ?? "none"}");
             
-            var maxPlayers = GetMaxPlayers(matchType);
+            var matchConfig = await GetMatchConfigAsync(matchType);
+            var maxPlayers = matchConfig.MaxPlayers;
 
             using var session = await _mongoClient.StartSessionAsync();
             session.StartTransaction();
@@ -105,33 +118,46 @@ namespace Server.Services
             }
         }
         
-        private int GetMaxPlayers(MatchType type)
+        private async Task<MatchConfig> GetMatchConfigAsync(MatchType type)
         {
-            return type switch
+            if (_matchConfigs == null)
             {
-                MatchType.Default => 10, _ => 10
-            };
+                var config = await _configs.GetConfigAsync(MatchConfig.MatchesConfigKey);
+                if (config == null)
+                {
+                    throw new RpcException(new Status(StatusCode.Internal, "Match configuration missing"));
+                }
+
+                var dict = JsonSerializer.Deserialize<Dictionary<string, MatchConfig>>(config.Value)
+                           ?? new Dictionary<string, MatchConfig>();
+                _matchConfigs = dict.ToDictionary(k => Enum.Parse<MatchType>(k.Key, true), v => v.Value);
+            }
+
+            if (_matchConfigs.TryGetValue(type, out var matchConfig))
+            {
+                return matchConfig;
+            }
+
+            throw new RpcException(new Status(StatusCode.Internal, $"Configuration for match type {type} not found"));
         }
 
         private async Task<Match> CreateMatchAsync(MatchType type,
                                                    string playerId,
                                                    IClientSessionHandle session)
         {
-            var (url, port) = AllocateServerEndpoint(type);
+            var matchConfig = await GetMatchConfigAsync(type);
+            var instance = await _instanceService.AllocateInstanceAsync(matchConfig.MaxPlayers);
+            var url = instance.Url;
+            var port = instance.Port;
 
-            var match = await _matches.CreateMatchAsync(new()
-            {
-                playerId
-            }, type, url, port);
+            var match = await _matches.CreateMatchAsync(
+                new List<string> { playerId },
+                type,
+                url,
+                port);
 
             return match;
         }
 
-        private static (string url, int port) AllocateServerEndpoint(MatchType type)
-        {
-            // quick placeholder – eg. choose random port on localhost
-            // integrate with real pool later.
-            return ("localhost", 12346);
-        }
     }
 }

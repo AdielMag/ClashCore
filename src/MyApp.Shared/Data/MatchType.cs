@@ -1,8 +1,8 @@
-﻿namespace Shared.Data
+namespace Shared.Data
 {
     public enum MatchType
     {
-        None = 0,
-        Default = 1
+        None,
+        Casual
     }
 }

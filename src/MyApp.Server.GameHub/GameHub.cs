@@ -112,7 +112,6 @@ namespace Server.Hubs.GamingHub
             try
             {
                 var playerId = _playerConnection.Id;
-                _logger.LogInformation($"Player {_playerConnection.Id} changed target to {targetId}");
                 Broadcast(_currentRoom.Group).OnTargetChanged(playerId, targetId);
             }
             catch (Exception ex)

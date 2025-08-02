@@ -13,6 +13,12 @@ namespace Server
         {
             var builder = WebApplication.CreateBuilder(args);
 
+            // Configure logging to reduce MagicOnion noise while keeping application logs
+            builder.Logging.AddFilter("MagicOnion", LogLevel.Warning);
+            builder.Logging.AddFilter("Grpc", LogLevel.Warning);
+            builder.Logging.AddFilter("Microsoft.AspNetCore", LogLevel.Warning);
+            builder.Services.AddLogging(logging => logging.SetMinimumLevel(LogLevel.Information));
+
             builder.Services.ConfigureMagicOnion();
 
             builder.ConfigureSecureKestrel<Program>(new KestrelSecureOptions
@@ -22,8 +28,6 @@ namespace Server
             builder.Services.AddMongoDb();
 
             builder.Services.AddScoped<GameHub>();
-
-            builder.Services.AddLogging(logging => logging.SetMinimumLevel(LogLevel.Debug));
 
             var app = builder.Build();
             app.MapMagicOnionService();

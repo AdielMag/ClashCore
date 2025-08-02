@@ -18,6 +18,10 @@ namespace Server
             // Add MongoDB
             builder.Services.AddMongoDb();
 
+            // Configure logging to reduce MagicOnion noise
+            builder.Logging.AddFilter("MagicOnion", LogLevel.Warning);
+            builder.Logging.AddFilter("Grpc", LogLevel.Warning);
+
             // Configure MagicOnion with proper gRPC settings
             builder.Services.ConfigureMagicOnion();
 

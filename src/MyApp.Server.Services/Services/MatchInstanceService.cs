@@ -91,7 +91,50 @@ namespace Server.Services
             var service = completedOperation.Result;
             var url = service.Uri ?? string.Empty;
 
+            // Set IAM policy to allow unauthenticated access using gcloud CLI
+            await SetIamPolicyForUnauthenticatedAccessAsync(serviceId, projectId, region);
+
             return await _instances.CreateInstanceAsync(url, port);
+        }
+
+        private async System.Threading.Tasks.Task SetIamPolicyForUnauthenticatedAccessAsync(string serviceId, string projectId, string region)
+        {
+            try
+            {
+                var processStartInfo = new System.Diagnostics.ProcessStartInfo
+                {
+                    FileName = "gcloud",
+                    Arguments = $"run services add-iam-policy-binding {serviceId} " +
+                               $"--region={region} " +
+                               $"--member=\"allUsers\" " +
+                               $"--role=\"roles/run.invoker\" " +
+                               $"--project={projectId}",
+                    UseShellExecute = false,
+                    CreateNoWindow = true,
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true
+                };
+
+                using var process = System.Diagnostics.Process.Start(processStartInfo);
+                if (process != null)
+                {
+                    await process.WaitForExitAsync();
+                    
+                    if (process.ExitCode != 0)
+                    {
+                        var error = await process.StandardError.ReadToEndAsync();
+                        _logger.LogWarning("Failed to set IAM policy for service {ServiceId}: {Error}", serviceId, error);
+                    }
+                    else
+                    {
+                        _logger.LogInformation("Successfully set IAM policy for unauthenticated access on service {ServiceId}", serviceId);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Exception while setting IAM policy for service {ServiceId}", serviceId);
+            }
         }
     }
 }

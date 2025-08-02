@@ -31,28 +31,28 @@ namespace Server.Helpers
                 return client.GetDatabase("MagicOnion-Exmaple");
             });
 
-            services.AddSingleton<IPlayersCollection>(sp =>
+            services.AddScoped<IPlayersCollection>(sp =>
             {
                 var database = sp.GetRequiredService<IMongoDatabase>();
                 var logger = sp.GetRequiredService<ILogger<PlayersCollection>>();
                 return new PlayersCollection(database, logger);
             });
 
-            services.AddSingleton<IMatchCollection>(sp =>
+            services.AddScoped<IMatchCollection>(sp =>
             {
                 var database = sp.GetRequiredService<IMongoDatabase>();
                 var logger = sp.GetRequiredService<ILogger<MatchCollection>>();
                 return new MatchCollection(database, logger);
             });
 
-            services.AddSingleton<IConfigsCollection>(sp =>
+            services.AddScoped<IConfigsCollection>(sp =>
             {
                 var database = sp.GetRequiredService<IMongoDatabase>();
                 var logger = sp.GetRequiredService<ILogger<ConfigsCollection>>();
                 return new ConfigsCollection(database, logger);
             });
 
-            services.AddSingleton<IMatchInstanceCollection>(sp =>
+            services.AddScoped<IMatchInstanceCollection>(sp =>
             {
                 var database = sp.GetRequiredService<IMongoDatabase>();
                 var logger = sp.GetRequiredService<ILogger<MatchInstanceCollection>>();

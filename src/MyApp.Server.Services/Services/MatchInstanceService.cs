@@ -46,6 +46,9 @@ namespace Server.Services
             var parent = LocationName.FromProjectLocation(projectId, region);
             var serviceId = $"gamehub-{Guid.NewGuid():N}";
 
+            var serviceAccount = Environment.GetEnvironmentVariable("SERVICE_ACCOUNT") ?? 
+                                 "cloudrun-runtime@clashcore.iam.gserviceaccount.com";
+            
             var port = 8080; // Example port, can be configured as needed
             var client = await ServicesClient.CreateAsync();
             var request = new CreateServiceRequest
@@ -56,6 +59,7 @@ namespace Server.Services
                 {
                     Template = new RevisionTemplate
                     {
+                        ServiceAccount = serviceAccount,
                         Containers =
                         {
                             new Google.Cloud.Run.V2.Container

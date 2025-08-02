@@ -62,6 +62,7 @@ namespace Server.Services
                 ServiceId = serviceId,
                 Service = new Service
                 {
+                    Ingress = Google.Cloud.Run.V2.IngressTraffic.All,
                     Template = new RevisionTemplate
                     {
                         ServiceAccount = serviceAccount,
@@ -87,7 +88,8 @@ namespace Server.Services
 
             var operation = await client.CreateServiceAsync(request);
             var completedOperation = await operation.PollUntilCompletedAsync();
-            var url = completedOperation.Result.Uri ?? string.Empty;
+            var service = completedOperation.Result;
+            var url = service.Uri ?? string.Empty;
 
             return await _instances.CreateInstanceAsync(url, port);
         }

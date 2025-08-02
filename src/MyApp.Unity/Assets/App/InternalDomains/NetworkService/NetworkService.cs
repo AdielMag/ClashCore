@@ -91,7 +91,7 @@ namespace App.InternalDomains.NetworkService
         {
             try
             {
-                _matchChannel = GrpcChannelx.ForTarget(new GrpcChannelTarget(url, port, false));
+                _matchChannel = GrpcChannelx.ForAddress(url);
                 _debugService?.Log("Match channel created successfully");
             }
             catch (Exception ex)

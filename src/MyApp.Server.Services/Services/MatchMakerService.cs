@@ -29,7 +29,6 @@ namespace Server.Services
         private readonly MatchInstanceService _instanceService;
         private readonly ILogger<MatchMakerService> _logger;
 
-        private Dictionary<MatchType, MatchConfig>? _matchConfigs;
 
         public MatchMakerService(IMongoClient mongoClient,
                                  ILogger<MatchMakerService> logger,
@@ -120,20 +119,17 @@ namespace Server.Services
         
         private async Task<MatchConfig> GetMatchConfigAsync(MatchType type)
         {
-            if (_matchConfigs == null)
+            var config = await _configs.GetConfigAsync(MatchConfig.MatchesConfigKey);
+            if (config == null)
             {
-                var config = await _configs.GetConfigAsync(MatchConfig.MatchesConfigKey);
-                if (config == null)
-                {
-                    throw new RpcException(new Status(StatusCode.Internal, "Match configuration missing"));
-                }
-
-                var dict = JsonSerializer.Deserialize<Dictionary<string, MatchConfig>>(config.Value)
-                           ?? new Dictionary<string, MatchConfig>();
-                _matchConfigs = dict.ToDictionary(k => Enum.Parse<MatchType>(k.Key, true), v => v.Value);
+                throw new RpcException(new Status(StatusCode.Internal, "Match configuration missing"));
             }
 
-            if (_matchConfigs.TryGetValue(type, out var matchConfig))
+            var dict = JsonSerializer.Deserialize<Dictionary<string, MatchConfig>>(config.Value)
+                       ?? new Dictionary<string, MatchConfig>();
+            var matchConfigs = dict.ToDictionary(k => Enum.Parse<MatchType>(k.Key, true), v => v.Value);
+
+            if (matchConfigs.TryGetValue(type, out var matchConfig))
             {
                 return matchConfig;
             }

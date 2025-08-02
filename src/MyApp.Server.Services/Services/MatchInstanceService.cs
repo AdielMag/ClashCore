@@ -72,6 +72,10 @@ namespace Server.Services
                             {
                                 Image = image,
                                 Ports = { new ContainerPort { ContainerPort_ = port } },
+                                Resources = new ResourceRequirements
+                                {
+                                    Limits = { { "memory", "256Mi" } }
+                                },
                                 Env =
                                 {
                                     new EnvVar

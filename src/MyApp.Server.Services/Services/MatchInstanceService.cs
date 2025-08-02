@@ -47,6 +47,12 @@ namespace Server.Services
 
             var serviceAccount = Environment.GetEnvironmentVariable("SERVICE_ACCOUNT") ?? 
                                  "cloudrun-runtime@clashcore.iam.gserviceaccount.com";
+
+            var mongoConnectionString = Environment.GetEnvironmentVariable("MONGO_DB_CONNECTION_STRING");
+            if (string.IsNullOrEmpty(mongoConnectionString))
+            {
+                throw new InvalidOperationException("MONGO_DB_CONNECTION_STRING environment variable is required for provisioning GameHub instances.");
+            }
             
             var port = 8080; // Example port, can be configured as needed
             var client = await ServicesClient.CreateAsync();
@@ -64,7 +70,15 @@ namespace Server.Services
                             new Google.Cloud.Run.V2.Container
                             {
                                 Image = image,
-                                Ports = { new ContainerPort { ContainerPort_ = port } }
+                                Ports = { new ContainerPort { ContainerPort_ = port } },
+                                Env =
+                                {
+                                    new EnvVar
+                                    {
+                                        Name = "MONGO_DB_CONNECTION_STRING",
+                                        Value = mongoConnectionString
+                                    }
+                                }
                             }
                         }
                     }

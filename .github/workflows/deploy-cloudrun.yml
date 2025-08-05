@@ -166,7 +166,7 @@ jobs:
       - name: Invalidate active matches after GameHub update
         run: |
           # Wait a moment for the image to be available in registry
-          sleep 30
+          sleep 10
           
           # Call the HTTP invalidation endpoint
           curl -X POST https://clashcore-services-${{ env.REGION }}.a.run.app/invalidate-matches \

@@ -39,6 +39,7 @@ namespace Server
             // Add HTTP endpoint for match invalidation (for CI/CD)
             app.MapPost("/invalidate-matches", async (MatchMakerService matchMakerService) =>
             {
+                
                 try
                 {
                     var result = await matchMakerService.InvalidateAllMatchesAsync();

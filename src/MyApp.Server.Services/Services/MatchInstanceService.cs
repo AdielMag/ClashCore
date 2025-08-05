@@ -63,11 +63,6 @@ namespace Server.Services
                 Service = new Service
                 {
                     Ingress = Google.Cloud.Run.V2.IngressTraffic.All,
-                    // Use annotations to allow unauthenticated access
-                    Annotations =
-                    {
-                        ["run.googleapis.com/ingress"] = "all"
-                    },
                     Template = new RevisionTemplate
                     {
                         ServiceAccount = serviceAccount,
@@ -97,7 +92,7 @@ namespace Server.Services
             var url = service.Uri ?? string.Empty;
 
             // Set IAM policy to allow unauthenticated access using IAM API
-            //await SetIamPolicyForUnauthenticatedAccessAsync(service.Name);
+            await SetIamPolicyForUnauthenticatedAccessAsync(service.Name);
 
             return await _instances.CreateInstanceAsync(url, port);
         }

@@ -47,6 +47,25 @@
           }
         }
       },
+      "Grpc.AspNetCore.Server/2.57.0": {
+        "type": "package",
+        "dependencies": {
+          "Grpc.Net.Common": "2.57.0"
+        },
+        "compile": {
+          "lib/net8.0/Grpc.AspNetCore.Server.dll": {
+            "related": ".pdb;.xml"
+          }
+        },
+        "runtime": {
+          "lib/net8.0/Grpc.AspNetCore.Server.dll": {
+            "related": ".pdb;.xml"
+          }
+        },
+        "frameworkReferences": [
+          "Microsoft.AspNetCore.App"
+        ]
+      },
       "Grpc.Core.Api/2.57.0": {
         "type": "package",
         "compile": {
@@ -58,6 +77,52 @@
           "lib/netstandard2.1/Grpc.Core.Api.dll": {
             "related": ".pdb;.xml"
           }
+        }
+      },
+      "Grpc.Net.Client/2.57.0": {
+        "type": "package",
+        "dependencies": {
+          "Grpc.Net.Common": "2.57.0",
+          "Microsoft.Extensions.Logging.Abstractions": "6.0.0"
+        },
+        "compile": {
+          "lib/net8.0/Grpc.Net.Client.dll": {
+            "related": ".pdb;.xml"
+          }
+        },
+        "runtime": {
+          "lib/net8.0/Grpc.Net.Client.dll": {
+            "related": ".pdb;.xml"
+          }
+        }
+      },
+      "Grpc.Net.Common/2.57.0": {
+        "type": "package",
+        "dependencies": {
+          "Grpc.Core.Api": "2.57.0"
+        },
+        "compile": {
+          "lib/net8.0/Grpc.Net.Common.dll": {
+            "related": ".pdb;.xml"
+          }
+        },
+        "runtime": {
+          "lib/net8.0/Grpc.Net.Common.dll": {
+            "related": ".pdb;.xml"
+          }
+        }
+      },
+      "MagicOnion/6.1.4": {
+        "type": "package",
+        "dependencies": {
+          "MagicOnion.Client": "6.1.4",
+          "MagicOnion.Server": "6.1.4"
+        },
+        "compile": {
+          "lib/net7.0/_._": {}
+        },
+        "runtime": {
+          "lib/net7.0/_._": {}
         }
       },
       "MagicOnion.Abstractions/6.1.4": {
@@ -73,6 +138,78 @@
         },
         "runtime": {
           "lib/netstandard2.0/MagicOnion.Abstractions.dll": {
+            "related": ".xml"
+          }
+        }
+      },
+      "MagicOnion.Client/6.1.4": {
+        "type": "package",
+        "dependencies": {
+          "Grpc.Net.Client": "2.57.0",
+          "MagicOnion.Abstractions": "6.1.4",
+          "MagicOnion.Serialization.MessagePack": "6.1.4",
+          "MagicOnion.Shared": "6.1.4"
+        },
+        "compile": {
+          "lib/net8.0/MagicOnion.Client.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net8.0/MagicOnion.Client.dll": {
+            "related": ".xml"
+          }
+        }
+      },
+      "MagicOnion.Serialization.MessagePack/6.1.4": {
+        "type": "package",
+        "dependencies": {
+          "MagicOnion.Abstractions": "6.1.4"
+        },
+        "compile": {
+          "lib/netstandard2.0/MagicOnion.Serialization.MessagePack.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/netstandard2.0/MagicOnion.Serialization.MessagePack.dll": {
+            "related": ".xml"
+          }
+        }
+      },
+      "MagicOnion.Server/6.1.4": {
+        "type": "package",
+        "dependencies": {
+          "Grpc.AspNetCore.Server": "2.57.0",
+          "Grpc.Core.Api": "2.57.0",
+          "MagicOnion.Abstractions": "6.1.4",
+          "MagicOnion.Serialization.MessagePack": "6.1.4",
+          "MagicOnion.Shared": "6.1.4"
+        },
+        "compile": {
+          "lib/net8.0/MagicOnion.Server.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net8.0/MagicOnion.Server.dll": {
+            "related": ".xml"
+          }
+        }
+      },
+      "MagicOnion.Shared/6.1.4": {
+        "type": "package",
+        "dependencies": {
+          "MagicOnion.Abstractions": "6.1.4",
+          "MagicOnion.Serialization.MessagePack": "6.1.4"
+        },
+        "compile": {
+          "lib/net8.0/MagicOnion.Shared.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net8.0/MagicOnion.Shared.dll": {
             "related": ".xml"
           }
         }
@@ -746,6 +883,24 @@
           "lib/net6.0/ZstdSharp.dll": {}
         }
       },
+      "MyApp.Server.Common/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v8.0",
+        "dependencies": {
+          "MagicOnion": "6.1.4",
+          "MagicOnion.Abstractions": "6.1.4",
+          "MessagePack.UnityShims": "3.1.3",
+          "Microsoft.Extensions.DependencyInjection": "7.0.0",
+          "MongoDB.Driver": "3.0.0",
+          "MyApp.Shared": "1.0.0"
+        },
+        "compile": {
+          "bin/placeholder/MyApp.Server.Common.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/MyApp.Server.Common.dll": {}
+        }
+      },
       "MyApp.Shared/1.0.0": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.1",
@@ -839,6 +994,28 @@
         "lib/netstandard2.1/DnsClient.xml"
       ]
     },
+    "Grpc.AspNetCore.Server/2.57.0": {
+      "sha512": "g4JKqJ3RB7WKOrBxMSCkRc/1Xa5GqYlVb7k8OjUsERKW7LdSQ0ajcFMZ4Q79BZgA/xbJlGttmq4ewyzpBqGetA==",
+      "type": "package",
+      "path": "grpc.aspnetcore.server/2.57.0",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "README.md",
+        "grpc.aspnetcore.server.2.57.0.nupkg.sha512",
+        "grpc.aspnetcore.server.nuspec",
+        "lib/net6.0/Grpc.AspNetCore.Server.dll",
+        "lib/net6.0/Grpc.AspNetCore.Server.pdb",
+        "lib/net6.0/Grpc.AspNetCore.Server.xml",
+        "lib/net7.0/Grpc.AspNetCore.Server.dll",
+        "lib/net7.0/Grpc.AspNetCore.Server.pdb",
+        "lib/net7.0/Grpc.AspNetCore.Server.xml",
+        "lib/net8.0/Grpc.AspNetCore.Server.dll",
+        "lib/net8.0/Grpc.AspNetCore.Server.pdb",
+        "lib/net8.0/Grpc.AspNetCore.Server.xml",
+        "packageIcon.png"
+      ]
+    },
     "Grpc.Core.Api/2.57.0": {
       "sha512": "48jpfMyYdhaPS6PGnk7sEqSO3+c/w11ahY+a33ymo0BsQEsBVIoJoS5xMsl5RzBlpKY41PnN+qJGMm3VyE5OQg==",
       "type": "package",
@@ -864,6 +1041,78 @@
         "packageIcon.png"
       ]
     },
+    "Grpc.Net.Client/2.57.0": {
+      "sha512": "vVDW0ePnaH9Na+wjm64vpzdj05JEjOCmAXUlANVc+s3hBBreEizfbmlzWPjsL6ZskaSrA59Ckb0J2l1HMvtMHQ==",
+      "type": "package",
+      "path": "grpc.net.client/2.57.0",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "README.md",
+        "grpc.net.client.2.57.0.nupkg.sha512",
+        "grpc.net.client.nuspec",
+        "lib/net462/Grpc.Net.Client.dll",
+        "lib/net462/Grpc.Net.Client.pdb",
+        "lib/net462/Grpc.Net.Client.xml",
+        "lib/net6.0/Grpc.Net.Client.dll",
+        "lib/net6.0/Grpc.Net.Client.pdb",
+        "lib/net6.0/Grpc.Net.Client.xml",
+        "lib/net7.0/Grpc.Net.Client.dll",
+        "lib/net7.0/Grpc.Net.Client.pdb",
+        "lib/net7.0/Grpc.Net.Client.xml",
+        "lib/net8.0/Grpc.Net.Client.dll",
+        "lib/net8.0/Grpc.Net.Client.pdb",
+        "lib/net8.0/Grpc.Net.Client.xml",
+        "lib/netstandard2.0/Grpc.Net.Client.dll",
+        "lib/netstandard2.0/Grpc.Net.Client.pdb",
+        "lib/netstandard2.0/Grpc.Net.Client.xml",
+        "lib/netstandard2.1/Grpc.Net.Client.dll",
+        "lib/netstandard2.1/Grpc.Net.Client.pdb",
+        "lib/netstandard2.1/Grpc.Net.Client.xml",
+        "packageIcon.png"
+      ]
+    },
+    "Grpc.Net.Common/2.57.0": {
+      "sha512": "babJpsAwVH3lPjg8cvWGqW+Fos1RN+cqudfkW2EyB2DK2v5yjD2axZ1Uay6kR6ec2/p9ljodktrfoJ2lJ/pwnQ==",
+      "type": "package",
+      "path": "grpc.net.common/2.57.0",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "grpc.net.common.2.57.0.nupkg.sha512",
+        "grpc.net.common.nuspec",
+        "lib/net6.0/Grpc.Net.Common.dll",
+        "lib/net6.0/Grpc.Net.Common.pdb",
+        "lib/net6.0/Grpc.Net.Common.xml",
+        "lib/net7.0/Grpc.Net.Common.dll",
+        "lib/net7.0/Grpc.Net.Common.pdb",
+        "lib/net7.0/Grpc.Net.Common.xml",
+        "lib/net8.0/Grpc.Net.Common.dll",
+        "lib/net8.0/Grpc.Net.Common.pdb",
+        "lib/net8.0/Grpc.Net.Common.xml",
+        "lib/netstandard2.0/Grpc.Net.Common.dll",
+        "lib/netstandard2.0/Grpc.Net.Common.pdb",
+        "lib/netstandard2.0/Grpc.Net.Common.xml",
+        "lib/netstandard2.1/Grpc.Net.Common.dll",
+        "lib/netstandard2.1/Grpc.Net.Common.pdb",
+        "lib/netstandard2.1/Grpc.Net.Common.xml",
+        "packageIcon.png"
+      ]
+    },
+    "MagicOnion/6.1.4": {
+      "sha512": "lRbm/ssA7O9g2aLJE2W4cwC9BaZfzIpkF26g8V+rpjmbdXradGdCIyDFcMKf/A73Nf/H2feihXIDgiTSDB25aQ==",
+      "type": "package",
+      "path": "magiconion/6.1.4",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "Icon.png",
+        "lib/net6.0/_._",
+        "lib/net7.0/_._",
+        "magiconion.6.1.4.nupkg.sha512",
+        "magiconion.nuspec"
+      ]
+    },
     "MagicOnion.Abstractions/6.1.4": {
       "sha512": "xDVwyvL1DkEXcMxiWa1HXozb5xNnJk8JHAXAkHMFLXD1t+2fkXU2iQSBIk5h4D7OUxJoJfexsuq4phLiZUOYiw==",
       "type": "package",
@@ -876,6 +1125,81 @@
         "lib/netstandard2.0/MagicOnion.Abstractions.xml",
         "magiconion.abstractions.6.1.4.nupkg.sha512",
         "magiconion.abstractions.nuspec"
+      ]
+    },
+    "MagicOnion.Client/6.1.4": {
+      "sha512": "Xx91EIkWrgVyWJuTvcIdvvHw020P8n/Qy/1i8iiI1Sjgwt/fcCVnRYgoNOOlJONJurkThlEZQACJIwn+Zq8t5A==",
+      "type": "package",
+      "path": "magiconion.client/6.1.4",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "Icon.png",
+        "analyzers/dotnet/roslyn4.3/cs/MagicOnion.Client.SourceGenerator.dll",
+        "lib/net6.0/MagicOnion.Client.dll",
+        "lib/net6.0/MagicOnion.Client.xml",
+        "lib/net7.0/MagicOnion.Client.dll",
+        "lib/net7.0/MagicOnion.Client.xml",
+        "lib/net8.0/MagicOnion.Client.dll",
+        "lib/net8.0/MagicOnion.Client.xml",
+        "lib/netstandard2.0/MagicOnion.Client.dll",
+        "lib/netstandard2.0/MagicOnion.Client.xml",
+        "lib/netstandard2.1/MagicOnion.Client.dll",
+        "lib/netstandard2.1/MagicOnion.Client.xml",
+        "magiconion.client.6.1.4.nupkg.sha512",
+        "magiconion.client.nuspec"
+      ]
+    },
+    "MagicOnion.Serialization.MessagePack/6.1.4": {
+      "sha512": "qElY5b0ibQmE57k+uKXYFRQ+EVoE1aKO0OLS93l43qxdIfqH6nA8/9XXHfMC9O9l07bHZJDYUX0RZnGSFaUMOQ==",
+      "type": "package",
+      "path": "magiconion.serialization.messagepack/6.1.4",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "Icon.png",
+        "lib/netstandard2.0/MagicOnion.Serialization.MessagePack.dll",
+        "lib/netstandard2.0/MagicOnion.Serialization.MessagePack.xml",
+        "magiconion.serialization.messagepack.6.1.4.nupkg.sha512",
+        "magiconion.serialization.messagepack.nuspec"
+      ]
+    },
+    "MagicOnion.Server/6.1.4": {
+      "sha512": "Ydi+BBztOukTYN4zuz9gJ7MOdg0oAjzLANjD+oMF37mOUVdTgrrD0U2GEVa/GnOSgBOJ0tLxq7irIkU21F8dOA==",
+      "type": "package",
+      "path": "magiconion.server/6.1.4",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "Icon.png",
+        "lib/net6.0/MagicOnion.Server.dll",
+        "lib/net6.0/MagicOnion.Server.xml",
+        "lib/net7.0/MagicOnion.Server.dll",
+        "lib/net7.0/MagicOnion.Server.xml",
+        "lib/net8.0/MagicOnion.Server.dll",
+        "lib/net8.0/MagicOnion.Server.xml",
+        "magiconion.server.6.1.4.nupkg.sha512",
+        "magiconion.server.nuspec"
+      ]
+    },
+    "MagicOnion.Shared/6.1.4": {
+      "sha512": "nBektZ/qhXFnE2y31KSHnbW1HhbvBgkEg+1IzcoqEb+GcWtwHjMGrNjMrNtqNW1iu8OgQ8P0Ph5UG+GqlTDHMg==",
+      "type": "package",
+      "path": "magiconion.shared/6.1.4",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "Icon.png",
+        "lib/net6.0/MagicOnion.Shared.dll",
+        "lib/net6.0/MagicOnion.Shared.xml",
+        "lib/net8.0/MagicOnion.Shared.dll",
+        "lib/net8.0/MagicOnion.Shared.xml",
+        "lib/netstandard2.0/MagicOnion.Shared.dll",
+        "lib/netstandard2.0/MagicOnion.Shared.xml",
+        "lib/netstandard2.1/MagicOnion.Shared.dll",
+        "lib/netstandard2.1/MagicOnion.Shared.xml",
+        "magiconion.shared.6.1.4.nupkg.sha512",
+        "magiconion.shared.nuspec"
       ]
     },
     "MessagePack/3.1.3": {
@@ -2130,6 +2454,11 @@
         "zstdsharp.port.nuspec"
       ]
     },
+    "MyApp.Server.Common/1.0.0": {
+      "type": "project",
+      "path": "../MyApp.Server.Common/MyApp.Server.Common.csproj",
+      "msbuildProject": "../MyApp.Server.Common/MyApp.Server.Common.csproj"
+    },
     "MyApp.Shared/1.0.0": {
       "type": "project",
       "path": "../MyApp.Shared/MyApp.Shared.csproj",
@@ -2143,7 +2472,7 @@
       "Microsoft.Extensions.Logging >= 8.0.0",
       "Microsoft.Extensions.Logging.Console >= 8.0.0",
       "MongoDB.Driver >= 2.22.0",
-      "MyApp.Shared >= 1.0.0"
+      "MyApp.Server.Common >= 1.0.0"
     ]
   },
   "packageFolders": {
@@ -2171,8 +2500,8 @@
         "net8.0": {
           "targetAlias": "net8.0",
           "projectReferences": {
-            "C:\\Users\\Adiel\\OneDrive\\מסמכים\\ForkRepos\\ClashCore\\src\\MyApp.Shared\\MyApp.Shared.csproj": {
-              "projectPath": "C:\\Users\\Adiel\\OneDrive\\מסמכים\\ForkRepos\\ClashCore\\src\\MyApp.Shared\\MyApp.Shared.csproj"
+            "C:\\Users\\Adiel\\OneDrive\\מסמכים\\ForkRepos\\ClashCore\\src\\MyApp.Server.Common\\MyApp.Server.Common.csproj": {
+              "projectPath": "C:\\Users\\Adiel\\OneDrive\\מסמכים\\ForkRepos\\ClashCore\\src\\MyApp.Server.Common\\MyApp.Server.Common.csproj"
             }
           }
         }
@@ -2233,5 +2562,16 @@
         "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.300/PortableRuntimeIdentifierGraph.json"
       }
     }
-  }
+  },
+  "logs": [
+    {
+      "code": "NU1605",
+      "level": "Error",
+      "message": "Warning As Error: Detected package downgrade: MongoDB.Driver from 3.0.0 to 2.22.0. Reference the package directly from the project to select a different version. \r\n MyApp.Server.Jobs -> MyApp.Server.Common -> MongoDB.Driver (>= 3.0.0) \r\n MyApp.Server.Jobs -> MongoDB.Driver (>= 2.22.0)",
+      "libraryId": "MongoDB.Driver",
+      "targetGraphs": [
+        "net8.0"
+      ]
+    }
+  ]
 }

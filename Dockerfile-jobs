@@ -8,8 +8,8 @@ COPY MyApp.Server.Jobs/MyApp.Server.Jobs.csproj MyApp.Server.Jobs/
 RUN dotnet restore MyApp.Server.Jobs/MyApp.Server.Jobs.csproj
 
 # Copy source code and build
-COPY MyApp.Server.Common/ src/MyApp.Server.Common/
-COPY MyApp.Server.Jobs/ src/MyApp.Server.Jobs/
+COPY MyApp.Server.Common/ MyApp.Server.Common/
+COPY MyApp.Server.Jobs/ MyApp.Server.Jobs/
 RUN dotnet build MyApp.Server.Jobs/MyApp.Server.Jobs.csproj -c Release -o /app/build
 
 # Publish stage

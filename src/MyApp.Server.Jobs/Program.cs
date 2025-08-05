@@ -25,7 +25,6 @@ namespace MyApp.Server.Jobs
                     logger.LogError("MONGO_DB_CONNECTION_STRING environment variable is required");
                     return 1;
                 }
-
                 
                 var client = new MongoClient(connectionString);
                 var database = client.GetDatabase("solaria");

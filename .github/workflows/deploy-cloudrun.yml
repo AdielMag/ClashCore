@@ -119,8 +119,7 @@ jobs:
           # Wait a moment for the image to be available in registry
           sleep 30
           
-          # Call the invalidation API endpoint
-          curl -X POST https://clashcore-services-${{ env.REGION }}.a.run.app/grpc/Shared.Services.IMatchMakerService/InvalidateAllMatchesAsync \
+          # Call the HTTP invalidation endpoint
+          curl -X POST https://clashcore-services-${{ env.REGION }}.a.run.app/invalidate-matches \
             -H "Content-Type: application/json" \
-            -d '{}' \
             --fail-with-body || echo "Warning: Failed to invalidate matches, but continuing deployment"

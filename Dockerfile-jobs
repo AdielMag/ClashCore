@@ -3,9 +3,9 @@ FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
 # Copy project files
-COPY MyApp.Server.Common/MyApp.Server.Common.csproj src/MyApp.Server.Common/
-COPY MyApp.Server.Jobs/MyApp.Server.Jobs.csproj src/MyApp.Server.Jobs/
-RUN dotnet restore src/MyApp.Server.Jobs/MyApp.Server.Jobs.csproj
+COPY MyApp.Server.Common/MyApp.Server.Common.csproj MyApp.Server.Common/
+COPY MyApp.Server.Jobs/MyApp.Server.Jobs.csproj MyApp.Server.Jobs/
+RUN dotnet restore MyApp.Server.Jobs/MyApp.Server.Jobs.csproj
 
 # Copy source code and build
 COPY MyApp.Server.Common/ src/MyApp.Server.Common/

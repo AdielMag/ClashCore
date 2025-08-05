@@ -35,21 +35,6 @@ namespace Server
             // Add health check endpoints for Cloud Run
             app.MapGet("/", () => "gRPC Server is running");
             app.MapGet("/health", () => "OK");
-            
-            // Add HTTP endpoint for match invalidation (for CI/CD)
-            app.MapPost("/invalidate-matches", async (MatchMakerService matchMakerService) =>
-            {
-                
-                try
-                {
-                    var result = await matchMakerService.InvalidateAllMatchesAsync();
-                    return Results.Ok(new { invalidatedCount = result, message = "Matches invalidated successfully" });
-                }
-                catch (Exception ex)
-                {
-                    return Results.Problem($"Failed to invalidate matches: {ex.Message}");
-                }
-            });
 
             // Important: Enable routing before mapping services
             app.UseRouting();

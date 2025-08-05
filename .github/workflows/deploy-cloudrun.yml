@@ -22,6 +22,11 @@ env:
   GAMEHUB_IMAGE_NAME: clashcore-gamehub
   GAMEHUB_REPO_NAME: clashcore
 
+  # Jobs
+  JOBS_IMAGE_NAME: clashcore-jobs
+  JOBS_REPO_NAME: clashcore
+  JOBS_JOB_NAME: invalidate-matches-job
+
   RUNTIME_SA: cloudrun-runtime@clashcore.iam.gserviceaccount.com
 
 jobs:
@@ -30,6 +35,7 @@ jobs:
     outputs:
       services-changed: ${{ steps.changes.outputs.services }}
       gamehub-changed: ${{ steps.changes.outputs.gamehub }}
+      jobs-changed: ${{ steps.changes.outputs.jobs }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -52,6 +58,9 @@ jobs:
           # Check for gamehub changes  
           GAMEHUB_CHANGED=$(echo "$CHANGED_FILES" | grep "^src/MyApp.Server.GameHub/" || true)
           
+          # Check for jobs changes
+          JOBS_CHANGED=$(echo "$CHANGED_FILES" | grep "^src/MyApp.Server.Jobs/" || true)
+          
           # Services should build if services OR shared/common changed
           if [[ -n "$SERVICES_CHANGED" || -n "$SHARED_CHANGED" ]]; then
             echo "services=true" >> $GITHUB_OUTPUT
@@ -68,6 +77,15 @@ jobs:
           else
             echo "gamehub=false" >> $GITHUB_OUTPUT
             echo "No GameHub build needed"
+          fi
+          
+          # Jobs should build if jobs OR shared/common changed
+          if [[ -n "$JOBS_CHANGED" || -n "$SHARED_CHANGED" ]]; then
+            echo "jobs=true" >> $GITHUB_OUTPUT
+            echo "Jobs build triggered - Jobs changed: $([[ -n "$JOBS_CHANGED" ]] && echo "yes" || echo "no"), Shared/Common changed: $([[ -n "$SHARED_CHANGED" ]] && echo "yes" || echo "no")"
+          else
+            echo "jobs=false" >> $GITHUB_OUTPUT
+            echo "No Jobs build needed"
           fi
 
   build-and-push-services:
@@ -130,6 +148,60 @@ jobs:
             --service-account=${{ env.RUNTIME_SA }} \
             --set-env-vars=MONGO_DB_CONNECTION_STRING=${{ secrets.MONGO_DB_CONNECTION_STRING }}
 
+  build-and-push-jobs:
+    runs-on: ubuntu-latest
+    needs: check-changes
+    if: needs.check-changes.outputs.jobs-changed == 'true'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+      - name: Set up gcloud CLI
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          project_id: ${{ env.PROJECT_ID }}
+          install_components: "beta"
+
+      - name: Configure Docker to use Artifact Registry
+        run: |
+          gcloud auth configure-docker ${{ env.REGION }}-docker.pkg.dev
+
+      - name: Build clashcore-jobs Docker image
+        run: |
+          docker build -f Dockerfile-jobs \
+            -t ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.JOBS_REPO_NAME }}/${{ env.JOBS_IMAGE_NAME }}:latest .
+
+      - name: Push clashcore-jobs Docker image
+        run: |
+          docker push ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.JOBS_REPO_NAME }}/${{ env.JOBS_IMAGE_NAME }}:latest
+      
+      - name: Create Cloud Run Job (if not exists)
+        run: |
+          # Check if job exists, create if it doesn't
+          if ! gcloud run jobs describe ${{ env.JOBS_JOB_NAME }} --region=${{ env.REGION }} >/dev/null 2>&1; then
+            echo "Creating Cloud Run Job..."
+            gcloud run jobs create ${{ env.JOBS_JOB_NAME }} \
+              --image ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.JOBS_REPO_NAME }}/${{ env.JOBS_IMAGE_NAME }}:latest \
+              --region ${{ env.REGION }} \
+              --service-account=${{ env.RUNTIME_SA }} \
+              --set-env-vars=MONGO_DB_CONNECTION_STRING=${{ secrets.MONGO_DB_CONNECTION_STRING }} \
+              --max-retries=1 \
+              --parallelism=1 \
+              --cpu=1 \
+              --memory=512Mi
+          else
+            echo "Updating existing Cloud Run Job..."
+            gcloud run jobs replace-job ${{ env.JOBS_JOB_NAME }} \
+              --image ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.JOBS_REPO_NAME }}/${{ env.JOBS_IMAGE_NAME }}:latest \
+              --region ${{ env.REGION }}
+          fi
+          
   build-gamehub-image:
     runs-on: ubuntu-latest
     needs: check-changes
@@ -168,7 +240,8 @@ jobs:
           # Wait a moment for the image to be available in registry
           sleep 10
           
-          # Call the HTTP invalidation endpoint
-          curl -X POST https://clashcore-services-${{ env.REGION }}.a.run.app/invalidate-matches \
-            -H "Content-Type: application/json" \
-            --fail-with-body || echo "Warning: Failed to invalidate matches, but continuing deployment"
+          # Execute the invalidation job
+          echo "Executing match invalidation job..."
+          gcloud run jobs execute ${{ env.JOBS_JOB_NAME }} \
+            --region ${{ env.REGION }} \
+            --wait || echo "Warning: Failed to invalidate matches, but continuing deployment"

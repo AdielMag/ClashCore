@@ -10,5 +10,7 @@ namespace Shared.Services
         UnaryResult<MatchConnectionData> JoinMatchAsync(string playerId,
                                                         Data.MatchType matchType,
                                                         string matchId);
+        
+        UnaryResult<long> InvalidateAllMatchesAsync();
     }
 }

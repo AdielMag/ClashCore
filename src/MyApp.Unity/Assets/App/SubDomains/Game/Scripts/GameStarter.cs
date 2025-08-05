@@ -63,7 +63,7 @@ namespace App.SubDomains.Game.Scripts
                 await _matchMakerService.JoinMatchAsync(playerId, MatchType.Casual, string.Empty);
             
             _debugService.Log($"GameStarter: Player {playerId} joined match {matchData.MatchId} at {matchData.Url}:{matchData.Port}.");
-            _networkService.CreateMatchChannel(matchData.Url, matchData.Port);
+            _networkService.CreateMatchChannel(matchData.Url);
 
             await _gameNetworkHubManager.ConnectAsync(matchData.MatchId, playerId);
             

@@ -75,6 +75,11 @@ namespace Server.Services
                         throw new RpcException(new Status(StatusCode.NotFound, "Match not found"));
                     }
 
+                    if (!match.IsValid)
+                    {
+                        throw new RpcException(new Status(StatusCode.FailedPrecondition, "Match is no longer valid"));
+                    }
+
                     if (match.PlayerCount >= maxPlayers)
                     {
                         throw new RpcException(new Status(StatusCode.ResourceExhausted, "Match is full"));
@@ -153,6 +158,22 @@ namespace Server.Services
                 port);
 
             return match;
+        }
+
+        public async UnaryResult<long> InvalidateAllMatchesAsync()
+        {
+            try
+            {
+                _logger.LogInformation("Invalidating all active matches");
+                var invalidatedCount = await _matches.InvalidateAllActiveMatchesAsync();
+                _logger.LogInformation("Successfully invalidated {Count} matches", invalidatedCount);
+                return invalidatedCount;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error invalidating all matches");
+                throw new RpcException(new Status(StatusCode.Internal, "Failed to invalidate matches"));
+            }
         }
 
     }

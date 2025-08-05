@@ -147,7 +147,8 @@ namespace Common.Mongo.Collection
         {
             var filter = Builders<Match>.Filter.And(
                 Builders<Match>.Filter.Eq(m => m.Type, matchType),
-                Builders<Match>.Filter.Lt(m => m.PlayerCount, maxPlayers));
+                Builders<Match>.Filter.Lt(m => m.PlayerCount, maxPlayers),
+                Builders<Match>.Filter.Eq(m => m.IsValid, true));
 
             var update = Builders<Match>.Update
                                         .AddToSet(m => m.Players, playerId); // won't add duplicates
@@ -200,6 +201,26 @@ namespace Common.Mongo.Collection
             {
                 _logger.LogError(ex, "Error deleting match with Id: {MatchId}", matchId);
                 throw new DatabaseOperationException($"Failed to delete match {matchId}", ex);
+            }
+        }
+
+        public async Task<long> InvalidateAllActiveMatchesAsync()
+        {
+            try
+            {
+                var filter = Builders<Match>.Filter.Eq(m => m.IsValid, true);
+                var update = Builders<Match>.Update.Set(m => m.IsValid, false);
+
+                var result = await _collection.UpdateManyAsync(filter, update);
+
+                _logger.LogInformation("Invalidated {Count} active matches", result.ModifiedCount);
+
+                return result.ModifiedCount;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error invalidating active matches");
+                throw new DatabaseOperationException("Failed to invalidate active matches", ex);
             }
         }
     }

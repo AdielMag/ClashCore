@@ -19,6 +19,7 @@ namespace Server.Mongo.Collection
             string     playerId,
             IClientSessionHandle session);
         Task DeleteMatchAsync(string matchId);
+        Task<long> InvalidateAllActiveMatchesAsync();
     }
 
 } 

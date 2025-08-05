@@ -113,3 +113,14 @@ jobs:
       - name: Push clashcore-gamehub Docker image
         run: |
           docker push ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.GAMEHUB_REPO_NAME }}/${{ env.GAMEHUB_IMAGE_NAME }}:latest
+
+      - name: Invalidate active matches after GameHub update
+        run: |
+          # Wait a moment for the image to be available in registry
+          sleep 30
+          
+          # Call the invalidation API endpoint
+          curl -X POST https://clashcore-services-${{ env.REGION }}.a.run.app/grpc/Shared.Services.IMatchMakerService/InvalidateAllMatchesAsync \
+            -H "Content-Type: application/json" \
+            -d '{}' \
+            --fail-with-body || echo "Warning: Failed to invalidate matches, but continuing deployment"

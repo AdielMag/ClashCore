@@ -14,5 +14,6 @@ namespace Server.Mongo.Entity
         public Shared.Data.MatchType Type { get; set; }
         public string Url { get; set; }
         public int Port { get; set; }
+        public bool IsValid { get; set; } = true;
     }
 } 

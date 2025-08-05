@@ -137,6 +137,7 @@ namespace Server.Hubs.GamingHub
 
         private async Task HandlePlayerTimeout()
         {
+            
             try
             {
                 await _currentRoom.Group.RemoveAsync(Context);

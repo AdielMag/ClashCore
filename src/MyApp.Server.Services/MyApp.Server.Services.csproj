@@ -12,7 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Google.Cloud.Run.V2" Version="1.4.0" />
+    <PackageReference Include="Google.Cloud.Run.V2" Version="2.0.0" />
     <PackageReference Include="MagicOnion" Version="6.1.4" />
     <PackageReference Include="MagicOnion.Server" Version="7.0.4" />
     <PackageReference Include="MessagePack.UnityShims" Version="3.1.3" />

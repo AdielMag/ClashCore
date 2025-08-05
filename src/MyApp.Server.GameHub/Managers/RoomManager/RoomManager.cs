@@ -22,6 +22,7 @@ namespace Server.Hubs.GamingHub.Managers.RoomManager
 
         public async Task<Room> GetOrCreateRoom(string roomName, IGroup group, IInMemoryStorage<TransformData> storage)
         {
+            
             return _rooms.GetOrAdd(roomName, _ => new Room(roomName, group, storage));
         }
 

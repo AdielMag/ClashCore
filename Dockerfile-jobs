@@ -3,11 +3,13 @@ FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
 # Copy project files
+COPY src/MyApp.Shared/MyApp.Shared.csproj MyApp.Shared/
 COPY src/MyApp.Server.Common/MyApp.Server.Common.csproj MyApp.Server.Common/
 COPY src/MyApp.Server.Jobs/MyApp.Server.Jobs.csproj MyApp.Server.Jobs/
 RUN dotnet restore MyApp.Server.Jobs/MyApp.Server.Jobs.csproj
 
 # Copy source code and build
+COPY src/MyApp.Shared/ MyApp.Shared/
 COPY src/MyApp.Server.Common/ MyApp.Server.Common/
 COPY src/MyApp.Server.Jobs/ MyApp.Server.Jobs/
 RUN dotnet build MyApp.Server.Jobs/MyApp.Server.Jobs.csproj -c Release -o /app/build

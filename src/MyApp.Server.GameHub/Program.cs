@@ -21,7 +21,6 @@ namespace Server
 
             builder.Services.ConfigureMagicOnion();
 
-
             builder.ConfigureSecureKestrel<Program>(new KestrelSecureOptions
             {
                 HttpsPort = 12346

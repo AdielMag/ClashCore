@@ -12,6 +12,7 @@ RUN dotnet restore MyApp.Server.Jobs/MyApp.Server.Jobs.csproj
 COPY src/MyApp.Shared/ MyApp.Shared/
 COPY src/MyApp.Server.Common/ MyApp.Server.Common/
 COPY src/MyApp.Server.Jobs/ MyApp.Server.Jobs/
+RUN dotnet clean MyApp.Server.Jobs/MyApp.Server.Jobs.csproj
 RUN dotnet build MyApp.Server.Jobs/MyApp.Server.Jobs.csproj -c Release -o /app/build
 
 # Publish stage

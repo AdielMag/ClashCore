@@ -6,6 +6,7 @@ WORKDIR /src
 COPY src/MyApp.Shared/MyApp.Shared.csproj MyApp.Shared/
 COPY src/MyApp.Server.Common/MyApp.Server.Common.csproj MyApp.Server.Common/
 COPY src/MyApp.Server.Jobs/MyApp.Server.Jobs.csproj MyApp.Server.Jobs/
+RUN dotnet nuget locals all --clear
 RUN dotnet restore MyApp.Server.Jobs/MyApp.Server.Jobs.csproj
 
 # Copy source code and build

@@ -25,10 +25,36 @@ namespace MyApp.Server.Jobs
                     logger.LogError("MONGO_DB_CONNECTION_STRING environment variable is required");
                     return 1;
                 }
-                
-                
+
                 var client = new MongoClient(connectionString);
                 var database = client.GetDatabase("solaria");
+
+                // Get job type from command line arguments, default to invalidate-matches
+                var jobType = args.Length > 0 ? args[0] : "invalidate-matches";
+                
+                logger.LogInformation("Starting job: {JobType}", jobType);
+
+                switch (jobType.ToLowerInvariant())
+                {
+                    case "invalidate-matches":
+                        return await InvalidateMatchesJob(database, logger);
+                    
+                    default:
+                        logger.LogError("Unknown job type: {JobType}. Available jobs: invalidate-matches", jobType);
+                        return 1;
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Job execution failed");
+                return 1;
+            }
+        }
+
+        private static async Task<int> InvalidateMatchesJob(IMongoDatabase database, ILogger logger)
+        {
+            try
+            {
                 var matchesCollection = database.GetCollection<Match>("matches");
 
                 logger.LogInformation("Starting match invalidation job...");

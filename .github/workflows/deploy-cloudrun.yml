@@ -25,7 +25,7 @@ env:
   # Jobs
   JOBS_IMAGE_NAME: clashcore-jobs
   JOBS_REPO_NAME: clashcore
-  JOBS_JOB_NAME: invalidate-matches-job
+  JOBS_JOB_NAME: admin-jobs
 
   RUNTIME_SA: cloudrun-runtime@clashcore.iam.gserviceaccount.com
 
@@ -263,4 +263,5 @@ jobs:
           echo "Executing match invalidation job..."
           gcloud run jobs execute ${{ env.JOBS_JOB_NAME }} \
             --region ${{ env.REGION }} \
+            --args="invalidate-matches" \
             --wait || echo "Warning: Failed to invalidate matches, but continuing deployment"

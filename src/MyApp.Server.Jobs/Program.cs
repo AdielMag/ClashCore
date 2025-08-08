@@ -59,10 +59,23 @@ namespace MyApp.Server.Jobs
 
                 logger.LogInformation("Starting match invalidation job...");
 
-                var filter = Builders<Match>.Filter.Eq(m => m.IsValid, true);
-                var update = Builders<Match>.Update.Set(m => m.IsValid, false);
+                // First, count total matches and valid matches for debugging
+                var totalMatches = await matchesCollection.CountDocumentsAsync(Builders<Match>.Filter.Empty);
+                var validMatchesFilter = Builders<Match>.Filter.Eq(m => m.IsValid, true);
+                var validMatchesCount = await matchesCollection.CountDocumentsAsync(validMatchesFilter);
 
-                var result = await matchesCollection.UpdateManyAsync(filter, update);
+                logger.LogInformation("Found {TotalMatches} total matches, {ValidMatches} are currently valid", 
+                    totalMatches, validMatchesCount);
+
+                if (validMatchesCount == 0)
+                {
+                    logger.LogInformation("No valid matches found to invalidate");
+                    return 0;
+                }
+
+                // Invalidate all valid matches
+                var update = Builders<Match>.Update.Set(m => m.IsValid, false);
+                var result = await matchesCollection.UpdateManyAsync(validMatchesFilter, update);
 
                 logger.LogInformation("Match invalidation completed. Modified {Count} matches", result.ModifiedCount);
                 

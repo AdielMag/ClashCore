@@ -205,7 +205,7 @@ jobs:
               --memory=512Mi
           else
             echo "Updating existing Cloud Run Job..."
-            gcloud run jobs replace-job ${{ env.JOBS_JOB_NAME }} \
+            gcloud run jobs update ${{ env.JOBS_JOB_NAME }} \
               --image="${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.JOBS_REPO_NAME }}/${{ env.JOBS_IMAGE_NAME }}:latest" \
               --region="${{ env.REGION }}"
           fi

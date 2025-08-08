@@ -195,10 +195,10 @@ jobs:
           if ! gcloud run jobs describe ${{ env.JOBS_JOB_NAME }} --region=${{ env.REGION }} >/dev/null 2>&1; then
             echo "Creating Cloud Run Job..."
             gcloud run jobs create ${{ env.JOBS_JOB_NAME }} \
-              --image ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.JOBS_REPO_NAME }}/${{ env.JOBS_IMAGE_NAME }}:latest \
-              --region ${{ env.REGION }} \
-              --service-account=${{ env.RUNTIME_SA }} \
-              --set-env-vars=MONGO_DB_CONNECTION_STRING=${{ secrets.MONGO_DB_CONNECTION_STRING }} \
+              --image="${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.JOBS_REPO_NAME }}/${{ env.JOBS_IMAGE_NAME }}:latest" \
+              --region="${{ env.REGION }}" \
+              --service-account="${{ env.RUNTIME_SA }}" \
+              --set-env-vars="MONGO_DB_CONNECTION_STRING=${{ secrets.MONGO_DB_CONNECTION_STRING }}" \
               --max-retries=1 \
               --parallelism=1 \
               --cpu=1 \
@@ -206,8 +206,8 @@ jobs:
           else
             echo "Updating existing Cloud Run Job..."
             gcloud run jobs replace-job ${{ env.JOBS_JOB_NAME }} \
-              --image ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.JOBS_REPO_NAME }}/${{ env.JOBS_IMAGE_NAME }}:latest \
-              --region ${{ env.REGION }}
+              --image="${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.JOBS_REPO_NAME }}/${{ env.JOBS_IMAGE_NAME }}:latest" \
+              --region="${{ env.REGION }}"
           fi
           
   build-push-gamehub:

@@ -88,7 +88,7 @@ jobs:
             echo "No Jobs build needed"
           fi
 
-  build-services:
+  build-push-services:
     runs-on: ubuntu-latest
     needs: check-changes
     if: needs.check-changes.outputs.services-changed == 'true'
@@ -111,32 +111,15 @@ jobs:
         run: |
           gcloud auth configure-docker ${{ env.REGION }}-docker.pkg.dev
 
-      - name: Build clashcore-services Docker image
+      - name: Build and push clashcore-services Docker image
         run: |
           docker build -f Dockerfile-deploy.services \
             -t ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.SERVICES_REPO_NAME }}/${{ env.SERVICES_IMAGE_NAME }}:latest .
-
-  push-services:
-    runs-on: ubuntu-latest
-    needs: build-services
-
-    steps:
-      - name: Authenticate to Google Cloud
-        uses: google-github-actions/auth@v2
-        with:
-          credentials_json: ${{ secrets.GCP_SA_KEY }}
-
-      - name: Configure Docker to use Artifact Registry
-        run: |
-          gcloud auth configure-docker ${{ env.REGION }}-docker.pkg.dev
-
-      - name: Push clashcore-services Docker image
-        run: |
           docker push ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.SERVICES_REPO_NAME }}/${{ env.SERVICES_IMAGE_NAME }}:latest
 
   deploy-services:
     runs-on: ubuntu-latest
-    needs: push-services
+    needs: build-push-services
 
     steps:
       - name: Authenticate to Google Cloud
@@ -160,7 +143,7 @@ jobs:
             --service-account=${{ env.RUNTIME_SA }} \
             --set-env-vars=MONGO_DB_CONNECTION_STRING=${{ secrets.MONGO_DB_CONNECTION_STRING }}
 
-  build-jobs:
+  build-push-jobs:
     runs-on: ubuntu-latest
     needs: check-changes
     if: needs.check-changes.outputs.jobs-changed == 'true'
@@ -184,38 +167,15 @@ jobs:
         run: |
           gcloud auth configure-docker ${{ env.REGION }}-docker.pkg.dev
 
-      - name: Build clashcore-jobs Docker image
+      - name: Build and push clashcore-jobs Docker image
         run: |
-          docker build -f Dockerfile-jobs \
+          docker build --no-cache -f Dockerfile-jobs \
             -t ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.JOBS_REPO_NAME }}/${{ env.JOBS_IMAGE_NAME }}:latest .
-
-  push-jobs:
-    runs-on: ubuntu-latest
-    needs: build-jobs
-
-    steps:
-      - name: Authenticate to Google Cloud
-        uses: google-github-actions/auth@v2
-        with:
-          credentials_json: ${{ secrets.GCP_SA_KEY }}
-
-      - name: Set up gcloud CLI
-        uses: google-github-actions/setup-gcloud@v2
-        with:
-          project_id: ${{ env.PROJECT_ID }}
-          install_components: "beta"
-
-      - name: Configure Docker to use Artifact Registry
-        run: |
-          gcloud auth configure-docker ${{ env.REGION }}-docker.pkg.dev
-
-      - name: Push clashcore-jobs Docker image
-        run: |
           docker push ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.JOBS_REPO_NAME }}/${{ env.JOBS_IMAGE_NAME }}:latest
 
   deploy-jobs:
     runs-on: ubuntu-latest
-    needs: push-jobs
+    needs: build-push-jobs
 
     steps:
       - name: Authenticate to Google Cloud
@@ -250,7 +210,7 @@ jobs:
               --region ${{ env.REGION }}
           fi
           
-  build-gamehub:
+  build-push-gamehub:
     runs-on: ubuntu-latest
     needs: check-changes
     if: needs.check-changes.outputs.gamehub-changed == 'true'
@@ -274,38 +234,15 @@ jobs:
         run: |
           gcloud auth configure-docker ${{ env.REGION }}-docker.pkg.dev
 
-      - name: Build clashcore-gamehub Docker image
+      - name: Build and push clashcore-gamehub Docker image
         run: |
           docker build -f Dockerfile-deploy.gamehub \
             -t ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.GAMEHUB_REPO_NAME }}/${{ env.GAMEHUB_IMAGE_NAME }}:latest .
-
-  push-gamehub:
-    runs-on: ubuntu-latest
-    needs: build-gamehub
-
-    steps:
-      - name: Authenticate to Google Cloud
-        uses: google-github-actions/auth@v2
-        with:
-          credentials_json: ${{ secrets.GCP_SA_KEY }}
-
-      - name: Set up gcloud CLI
-        uses: google-github-actions/setup-gcloud@v2
-        with:
-          project_id: ${{ env.PROJECT_ID }}
-          install_components: "beta"
-
-      - name: Configure Docker to use Artifact Registry
-        run: |
-          gcloud auth configure-docker ${{ env.REGION }}-docker.pkg.dev
-
-      - name: Push clashcore-gamehub Docker image
-        run: |
           docker push ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.GAMEHUB_REPO_NAME }}/${{ env.GAMEHUB_IMAGE_NAME }}:latest
 
   invalidate-matches:
     runs-on: ubuntu-latest
-    needs: [check-changes, push-gamehub]
+    needs: [check-changes, build-push-gamehub]
     if: needs.check-changes.outputs.gamehub-changed == 'true'
 
     steps:

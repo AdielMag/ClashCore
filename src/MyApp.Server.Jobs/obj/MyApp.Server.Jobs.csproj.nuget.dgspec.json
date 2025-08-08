@@ -133,6 +133,18 @@
         "net8.0": {
           "targetAlias": "net8.0",
           "dependencies": {
+            "MagicOnion": {
+              "target": "Package",
+              "version": "[6.1.4, )"
+            },
+            "MagicOnion.Client": {
+              "target": "Package",
+              "version": "[6.1.4, )"
+            },
+            "MessagePack.UnityShims": {
+              "target": "Package",
+              "version": "[3.1.3, )"
+            },
             "Microsoft.Extensions.Configuration": {
               "target": "Package",
               "version": "[8.0.0, )"

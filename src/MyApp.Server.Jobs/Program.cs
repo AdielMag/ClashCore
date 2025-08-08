@@ -26,6 +26,7 @@ namespace MyApp.Server.Jobs
                     return 1;
                 }
                 
+                
                 var client = new MongoClient(connectionString);
                 var database = client.GetDatabase("solaria");
                 var matchesCollection = database.GetCollection<Match>("matches");

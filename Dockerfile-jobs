@@ -13,6 +13,7 @@ RUN dotnet restore MyApp.Server.Jobs/MyApp.Server.Jobs.csproj
 COPY src/MyApp.Shared/ MyApp.Shared/
 COPY src/MyApp.Server.Common/ MyApp.Server.Common/
 COPY src/MyApp.Server.Jobs/ MyApp.Server.Jobs/
+RUN dotnet restore MyApp.Server.Jobs/MyApp.Server.Jobs.csproj --force
 RUN dotnet publish MyApp.Server.Jobs/MyApp.Server.Jobs.csproj -c Release -o /app/publish --no-restore
 
 # Runtime stage

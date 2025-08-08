@@ -242,7 +242,7 @@ jobs:
 
   invalidate-matches:
     runs-on: ubuntu-latest
-    needs: [check-changes, build-push-gamehub]
+    needs: [build-push-gamehub]
     if: needs.check-changes.outputs.gamehub-changed == 'true'
 
     steps:

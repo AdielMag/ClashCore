@@ -757,6 +757,7 @@
         "dependencies": {
           "MagicOnion.Server": "6.1.4",
           "MessagePack.UnityShims": "3.1.3",
+          "MessagePackAnalyzer": "3.1.3",
           "Microsoft.Extensions.DependencyInjection": "7.0.0",
           "MongoDB.Driver": "3.0.0",
           "MyApp.Shared": "1.0.0"
@@ -2166,6 +2167,7 @@
     "net8.0": [
       "MagicOnion.Server >= 6.1.4",
       "MessagePack.UnityShims >= 3.1.3",
+      "MessagePackAnalyzer >= 3.1.3",
       "Microsoft.Extensions.Configuration >= 8.0.0",
       "Microsoft.Extensions.Configuration.EnvironmentVariables >= 8.0.0",
       "Microsoft.Extensions.Logging >= 8.0.0",
@@ -2226,6 +2228,11 @@
             "version": "[6.1.4, )"
           },
           "MessagePack.UnityShims": {
+            "target": "Package",
+            "version": "[3.1.3, )"
+          },
+          "MessagePackAnalyzer": {
+            "include": "None",
             "target": "Package",
             "version": "[3.1.3, )"
           },

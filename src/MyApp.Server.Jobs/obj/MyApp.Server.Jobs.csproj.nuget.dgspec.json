@@ -137,10 +137,6 @@
               "target": "Package",
               "version": "[6.1.4, )"
             },
-            "MagicOnion.Client": {
-              "target": "Package",
-              "version": "[6.1.4, )"
-            },
             "MessagePack.UnityShims": {
               "target": "Package",
               "version": "[3.1.3, )"

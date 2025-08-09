@@ -62,7 +62,11 @@ namespace App.SubDomains.Game.Scripts
             var matchData =
                 await _matchMakerService.JoinMatchAsync(playerId, MatchType.Casual, string.Empty);
             
-            _debugService.Log($"GameStarter: Player {playerId} joined match {matchData.MatchId} at {matchData.Url}:{matchData.Port}.");
+            var expirationInfo = matchData.ExpirationTimeUtc.HasValue 
+                ? $" (expires at {matchData.ExpirationTimeUtc.Value:yyyy-MM-dd HH:mm:ss} UTC)" 
+                : " (no expiration)";
+            
+            _debugService.Log($"GameStarter: Player {playerId} joined match {matchData.MatchId} at {matchData.Url}:{matchData.Port}{expirationInfo}.");
             _networkService.CreateMatchChannel(matchData.Url);
 
             await _gameNetworkHubManager.ConnectAsync(matchData.MatchId, playerId);

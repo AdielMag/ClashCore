@@ -9,6 +9,7 @@ using MongoDB.Driver;
 
 using Server.Mongo.Collection;
 using Server.Mongo.Entity;
+using Server.Common.Extensions;
 
 using MyApp.Shared.Data;
 using Shared.Data;
@@ -108,7 +109,10 @@ namespace Server.Services
 
                 return new MatchConnectionData
                 {
-                    MatchId = match.Id, Url = match.Url, Port = match.Port
+                    MatchId = match.Id, 
+                    Url = match.Url, 
+                    Port = match.Port,
+                    ExpirationTimeUtc = match.GetExpirationTime()
                 };
             }
             catch (RpcException)

@@ -10,6 +10,7 @@ using MongoDB.Driver;
 using Server.Mongo.Collection;
 using Server.Mongo.Entity;
 
+using MyApp.Shared.Data;
 using Shared.Data;
 using Shared.Services;
 using System;
@@ -151,11 +152,12 @@ namespace Server.Services
             var url = instance.Url;
             var port = instance.Port;
 
-            var match = await _matches.CreateMatchAsync(
-                new List<string> { playerId },
-                type,
-                url,
-                port);
+            var match = await _matches.CreateMatchAsync([playerId],
+                                                        type,
+                                                        url,
+                                                        port,
+                                                        matchConfig.Duration,
+                                                        matchConfig.LimitType);
 
             return match;
         }

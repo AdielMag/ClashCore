@@ -1,5 +1,6 @@
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
+using MyApp.Shared.Data;
 
 namespace Server.Mongo.Entity
 {
@@ -15,5 +16,9 @@ namespace Server.Mongo.Entity
         public string Url { get; set; }
         public int Port { get; set; }
         public bool IsValid { get; set; } = true;
+        
+        // Time-based limits
+        public TimeSpan? Duration { get; set; }
+        public MatchLimitType LimitType { get; set; } = MatchLimitType.None;
     }
 } 

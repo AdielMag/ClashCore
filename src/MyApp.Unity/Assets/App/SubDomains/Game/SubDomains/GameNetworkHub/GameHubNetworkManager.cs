@@ -9,6 +9,7 @@ using Cysharp.Threading.Tasks;
 
 using Shared.Data;
 using Shared.Hubs;
+using MyApp.Shared.Data;
 
 using Quaternion = System.Numerics.Quaternion;
 using Vector3 = System.Numerics.Vector3;
@@ -108,6 +109,16 @@ namespace App.SubDomains.Game.SubDomains.GameNetworkHub
         void IGameHubReceiver.OnTargetChanged(string playerId, string targetId)
         {
             _playersManager.OnPlayerTargetChanged(playerId, targetId);
+        }
+
+        void IGameHubReceiver.OnMatchExpired(MatchExpirationData expirationData)
+        {
+            _debugService.Log($"Match expired: {expirationData.MatchId} at {expirationData.ExpirationTime}");
+            
+            // TODO: Handle match expiration - show UI notification, disconnect players, etc.
+            // For now, just log the event with empty data structure
+            _debugService.Log($"Expiration type: {expirationData.ExpirationType}");
+            _debugService.Log($"Additional data count: {expirationData.Data.Count}");
         }
 
         public void Dispose()

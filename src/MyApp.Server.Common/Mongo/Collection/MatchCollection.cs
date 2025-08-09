@@ -1,9 +1,11 @@
 using Microsoft.Extensions.Logging;
+using MyApp.Shared.Data;
 
 using MongoDB.Bson;
 using MongoDB.Driver;
 
 using Server.Common.Exceptions;
+using Server.Common.Extensions;
 using Server.Mongo.Collection;
 using Server.Mongo.Entity;
 
@@ -92,6 +94,51 @@ namespace Common.Mongo.Collection
             }
         }
 
+        public async Task<Match> CreateMatchAsync(List<string> players, 
+                                                  MatchType matchType, 
+                                                  string url, 
+                                                  int port,
+                                                  TimeSpan? duration = null,
+                                                  MatchLimitType limitType = MatchLimitType.None)
+        {
+            if (players == null || !players.Any())
+            {
+                throw new ArgumentException("Players list cannot be null or empty", nameof(players));
+            }
+
+            var match = new Match
+            {
+                Id = ObjectId.GenerateNewId().ToString(),
+                Players = players,
+                PlayerCount = players.Count,
+                CreatedAt = DateTime.UtcNow,
+                Type = matchType,
+                Url = url,
+                Port = port,
+                Duration = duration,
+                LimitType = limitType
+            };
+
+            // Validate limit type (only None and Time are supported)
+            match.ValidateLimitType();
+
+            try
+            {
+                await _collection.InsertOneAsync(match);
+
+                _logger.LogInformation("Created new match - Id: {Id}, Players: {Players}, Duration: {Duration}, LimitType: {LimitType}", 
+                    match.Id, string.Join(", ", players), duration, limitType);
+
+                return match;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to create match - Players: {Players}",
+                    string.Join(", ", players));
+                throw new DatabaseOperationException("Failed to create match", ex);
+            }
+        }
+
         public async Task<Match> GetMatchByIdAsync(string matchId)
         {
             if (string.IsNullOrEmpty(matchId))
@@ -150,6 +197,32 @@ namespace Common.Mongo.Collection
                 Builders<Match>.Filter.Lt(m => m.PlayerCount, maxPlayers),
                 Builders<Match>.Filter.Eq(m => m.IsValid, true));
 
+            // First, find potentially valid matches
+            var potentialMatches = await _collection.Find(filter).ToListAsync();
+            
+            // Filter out expired matches
+            var validMatches = potentialMatches.Where(m => !m.IsExpired()).ToList();
+            
+            if (!validMatches.Any())
+            {
+                // If we found matches but they're all expired, invalidate them
+                var expiredMatches = potentialMatches.Where(m => m.IsExpired()).ToList();
+                if (expiredMatches.Any())
+                {
+                    var expiredIds = expiredMatches.Select(m => m.Id).ToList();
+                    var expiredFilter = Builders<Match>.Filter.In(m => m.Id, expiredIds);
+                    var invalidateUpdate = Builders<Match>.Update.Set(m => m.IsValid, false);
+                    await _collection.UpdateManyAsync(session, expiredFilter, invalidateUpdate);
+                    
+                    _logger.LogInformation("Invalidated {Count} expired matches", expiredMatches.Count);
+                }
+                return null;
+            }
+
+            // Use the first valid match
+            var targetMatch = validMatches.First();
+            filter = Builders<Match>.Filter.Eq(m => m.Id, targetMatch.Id);
+
             var update = Builders<Match>.Update
                                         .AddToSet(m => m.Players, playerId); // won't add duplicates
 
@@ -201,6 +274,35 @@ namespace Common.Mongo.Collection
             {
                 _logger.LogError(ex, "Error deleting match with Id: {MatchId}", matchId);
                 throw new DatabaseOperationException($"Failed to delete match {matchId}", ex);
+            }
+        }
+
+        public async Task InvalidateMatchAsync(string matchId)
+        {
+            if (string.IsNullOrEmpty(matchId))
+            {
+                throw new ArgumentException("Match ID cannot be null or empty", nameof(matchId));
+            }
+
+            try
+            {
+                var filter = Builders<Match>.Filter.Eq(m => m.Id, matchId);
+                var update = Builders<Match>.Update.Set(m => m.IsValid, false);
+
+                var result = await _collection.UpdateOneAsync(filter, update);
+
+                if (result.MatchedCount == 0)
+                {
+                    _logger.LogWarning("No match found to invalidate with Id: {MatchId}", matchId);
+                    throw new MatchNotFoundException(matchId);
+                }
+
+                _logger.LogInformation("Invalidated match with Id: {MatchId}", matchId);
+            }
+            catch (Exception ex) when (ex is not MatchNotFoundException)
+            {
+                _logger.LogError(ex, "Error invalidating match with Id: {MatchId}", matchId);
+                throw new DatabaseOperationException($"Failed to invalidate match {matchId}", ex);
             }
         }
 

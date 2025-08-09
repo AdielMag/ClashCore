@@ -1,4 +1,5 @@
 using Shared.Data;
+using MyApp.Shared.Data;
 
 namespace Shared.Hubs
 {
@@ -8,5 +9,6 @@ namespace Shared.Hubs
         void OnLeave(TransformData transformData);
         void OnMove(TransformData transformData);
         void OnTargetChanged(string playerId, string targetId);
+        void OnMatchExpired(MatchExpirationData expirationData);
     }
 }

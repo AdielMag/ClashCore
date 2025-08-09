@@ -72,6 +72,8 @@
     <Compile Include="C:\Users\Adiel\OneDrive\מסמכים\ForkRepos\ClashCore\src\MyApp.Shared\Formatters\MessagePackResolverConfig.cs" />
     <Compile Include="C:\Users\Adiel\OneDrive\מסמכים\ForkRepos\ClashCore\src\MyApp.Shared\Services\ISampleService.cs" />
     <Compile Include="C:\Users\Adiel\OneDrive\מסמכים\ForkRepos\ClashCore\src\MyApp.Shared\Controller\PhysicsController\Interface\ITransformable.cs" />
+    <Compile Include="C:\Users\Adiel\OneDrive\מסמכים\ForkRepos\ClashCore\src\MyApp.Shared\Data\MatchExpirationData.cs" />
+    <Compile Include="C:\Users\Adiel\OneDrive\מסמכים\ForkRepos\ClashCore\src\MyApp.Shared\Data\MatchLimitType.cs" />
     <Compile Include="C:\Users\Adiel\OneDrive\מסמכים\ForkRepos\ClashCore\src\MyApp.Shared\Services\IMatchMakerService.cs" />
     <Compile Include="C:\Users\Adiel\OneDrive\מסמכים\ForkRepos\ClashCore\src\MyApp.Shared\Hubs\IGameHubReceiver.cs" />
     <Compile Include="C:\Users\Adiel\OneDrive\מסמכים\ForkRepos\ClashCore\src\MyApp.Shared\Data\MatchConfig.cs" />

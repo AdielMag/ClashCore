@@ -6,13 +6,17 @@ using MagicOnion.Server.Hubs;
 
 using Microsoft.Extensions.Logging;
 
+using Server.Common.Extensions;
 using Server.Hubs.GamingHub.Data;
 using Server.Hubs.GamingHub.Managers.ConnectionManager;
-using Server.Hubs.GamingHub.Managers.RoomManager;
 using Server.Hubs.GamingHub.Validators.MovementValidator;
+using Server.Mongo.Collection;
+using Server.Mongo.Entity;
 
 using Shared.Data;
 using Shared.Hubs;
+
+using MyApp.Shared.Data;
 
 namespace Server.Hubs.GamingHub
 {
@@ -23,18 +27,20 @@ namespace Server.Hubs.GamingHub
         private readonly ILogger<GameHub> _logger;
         private readonly IConnectionManager _connectionManager;
         private readonly IMovementValidator _movementValidator;
-        private readonly IRoomManager _roomManager;
+        private readonly IMatchCollection _matchCollection;
         
         private PlayerConnection _playerConnection;
         private Room _currentRoom;
         private DateTime _lastMoveTime;
+        private string _matchId;
+        private Timer _matchExpirationTimer;
 
-        public GameHub(ILogger<GameHub> logger)
+        public GameHub(ILogger<GameHub> logger, IMatchCollection matchCollection)
         {
             _logger = logger;
+            _matchCollection = matchCollection;
             _connectionManager = new ConnectionManager(logger, _kReconnectTimeoutSeconds);
             _movementValidator = new MovementValidator();
-            _roomManager = new RoomManager(logger);
             _lastMoveTime = DateTime.UtcNow;
         }
 
@@ -48,14 +54,18 @@ namespace Server.Hubs.GamingHub
                 _connectionManager.CancelDisconnectionTimer(id);
 
                 var (group, storage) = await Group.AddAsync(roomName, transformData);
-                _currentRoom = await _roomManager.GetOrCreateRoom(roomName, group, storage);
+                _currentRoom = new Room(roomName, group, storage);
                 
                 if (!_currentRoom.Players.TryAdd(id, _playerConnection))
                 {
                     _logger.LogWarning($"Player {id} already exists in room {roomName}");
                 }
                 
-                _logger.LogInformation($"Player {id} joined room {roomName}");
+                _matchId = roomName;
+                
+                await StartMatchExpirationMonitoring();
+                
+                _logger.LogInformation($"Player {id} josned room {roomName}");
                 Broadcast(_currentRoom.Group).OnJoin(transformData);
 
                 return _currentRoom.Storage.AllValues.ToArray();
@@ -152,9 +162,129 @@ namespace Server.Hubs.GamingHub
             }
         }
 
+        private async Task StartMatchExpirationMonitoring()
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(_matchId))
+                {
+                    return;
+                }
+
+                // Only the first player in the room should create the timer
+                if (_currentRoom.Players.Count > 1)
+                {
+                    _logger.LogInformation($"Match expiration timer already handled by first player in room {_matchId}, skipping");
+                    return;
+                }
+
+                // Get match details to check if it has time limits
+                var match = await _matchCollection.GetMatchByIdAsync(_matchId);
+
+                // Validate limit type
+                match.ValidateLimitType();
+
+                // Check if match has time-based limits
+                if (!match.LimitType.HasFlag(MatchLimitType.Time) || !match.Duration.HasValue)
+                {
+                    _logger.LogInformation($"Match {_matchId} has no time limits, skipping expiration monitoring");
+                    return;
+                }
+
+                // Calculate time until expiration
+                var expirationTime = match.GetExpirationTime();
+                if (!expirationTime.HasValue)
+                {
+                    return;
+                }
+
+                var timeUntilExpiration = expirationTime.Value - DateTime.UtcNow;
+                if (timeUntilExpiration <= TimeSpan.Zero)
+                {
+                    // Match is already expired
+                    _logger.LogWarning($"Match {_matchId} is already expired");
+                    await HandleMatchExpiration(match);
+                    return;
+                }
+
+                _logger.LogInformation($"Starting match expiration timer for match {_matchId}, expires in {timeUntilExpiration}");
+                
+                // This instance becomes the timer owner
+                _matchExpirationTimer = new Timer(async void (_) =>
+                                                  {
+                                                      await HandleMatchExpiration(match);
+                                                  }, 
+                    null, timeUntilExpiration, Timeout.InfiniteTimeSpan);
+                
+                _logger.LogInformation($"Successfully created expiration timer for match {_matchId}");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error starting match expiration monitoring for match {_matchId}");
+            }
+        }
+
+        private async Task HandleMatchExpiration(Match match)
+        {
+            try
+            {
+                _logger.LogInformation($"Match {match.Id} has expired, notifying players and invalidating match");
+
+                // Dispose our timer since we're the owner
+                await _matchExpirationTimer.DisposeAsync();
+                _matchExpirationTimer = null;
+
+                // Invalidate the match in database
+                await _matchCollection.InvalidateMatchAsync(match.Id);
+
+                // Create expiration data
+                var expirationData = new MatchExpirationData
+                {
+                    MatchId = match.Id,
+                    ExpirationType = match.LimitType,
+                    ExpirationTime = match.GetExpirationTime() ?? DateTime.UtcNow,
+                    Data = new Dictionary<string, object>() // Empty for now, can be populated later
+                };
+
+                // Notify all players in the current room
+                Broadcast(_currentRoom.Group).OnMatchExpired(expirationData);
+                _logger.LogInformation($"Match expiration notification sent to {_currentRoom.Players.Count} players in room {match.Id}");
+
+                CleanupExpiredMatch(match.Id);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error handling match expiration for match {match?.Id}");
+            }
+        }
+
+        private void CleanupExpiredMatch(string matchId)
+        {
+            try
+            {
+                _logger.LogInformation($"Cleaning up expired match {matchId}");
+                
+                // Clear all players from the current room
+                var playerIds = _currentRoom.Players.Keys.ToList();
+                foreach (var playerId in playerIds)
+                {
+                    _currentRoom.Players.TryRemove(playerId, out _);
+                }
+                
+                _logger.LogInformation($"Completed cleanup for expired match {matchId}");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error during match cleanup for {matchId}");
+            }
+        }
+
         public void Dispose()
         {
             _connectionManager.Cleanup(_playerConnection.Id);
+            
+            _matchExpirationTimer.Dispose();
+            _matchExpirationTimer = null;
         }
     }
 }

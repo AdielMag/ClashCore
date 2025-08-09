@@ -27,7 +27,7 @@ namespace MyApp.Server.Jobs
                 }
 
                 var client = new MongoClient(connectionString);
-                var database = client.GetDatabase("solaria");
+                var database = client.GetDatabase("MagicOnion-Exmaple");
 
                 // Get job type from command line arguments, default to invalidate-matches
                 var jobType = args.Length > 0 ? args[0] : "invalidate-matches";

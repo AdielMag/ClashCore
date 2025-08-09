@@ -19,6 +19,7 @@ namespace Server
             builder.Logging.AddFilter("Microsoft.AspNetCore", LogLevel.Warning);
             builder.Services.AddLogging(logging => logging.SetMinimumLevel(LogLevel.Information));
 
+            
             builder.Services.ConfigureMagicOnion();
 
             builder.ConfigureSecureKestrel<Program>(new KestrelSecureOptions

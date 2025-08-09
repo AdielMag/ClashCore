@@ -6,5 +6,6 @@ namespace Server.Mongo.Collection
     {
         Task<MatchInstance?> TryAllocateInstanceAsync(int capacity, int requiredSlots);
         Task<MatchInstance> CreateInstanceAsync(string url, int port);
+        Task<List<MatchInstance>> GetInstancesByUrlAndPortAsync(string url, int port);
     }
 }

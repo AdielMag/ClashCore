@@ -1,5 +1,6 @@
 
 
+using System.Linq;
 using System.Numerics;
 
 using MagicOnion.Server.Hubs;
@@ -28,6 +29,7 @@ namespace Server.Hubs.GamingHub
         private readonly IConnectionManager _connectionManager;
         private readonly IMovementValidator _movementValidator;
         private readonly IMatchCollection _matchCollection;
+        private readonly IMatchInstanceCollection _matchInstanceCollection;
         
         private PlayerConnection _playerConnection;
         private Room _currentRoom;
@@ -35,10 +37,11 @@ namespace Server.Hubs.GamingHub
         private string _matchId;
         private Timer _matchExpirationTimer;
 
-        public GameHub(ILogger<GameHub> logger, IMatchCollection matchCollection)
+        public GameHub(ILogger<GameHub> logger, IMatchCollection matchCollection, IMatchInstanceCollection matchInstanceCollection)
         {
             _logger = logger;
             _matchCollection = matchCollection;
+            _matchInstanceCollection = matchInstanceCollection;
             _connectionManager = new ConnectionManager(logger, _kReconnectTimeoutSeconds);
             _movementValidator = new MovementValidator();
             _lastMoveTime = DateTime.UtcNow;
@@ -233,10 +236,7 @@ namespace Server.Hubs.GamingHub
                 // Dispose our timer since we're the owner
                 await _matchExpirationTimer.DisposeAsync();
                 _matchExpirationTimer = null;
-
-                // Invalidate the match in database
-                await _matchCollection.InvalidateMatchAsync(match.Id);
-
+                
                 // Create expiration data
                 var expirationData = new MatchExpirationData
                 {

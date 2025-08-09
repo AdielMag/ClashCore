@@ -2,6 +2,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
 using Server.Mongo.Entity;
+using Common.Mongo.Collection;
+using Server.Mongo.Collection;
 
 namespace MyApp.Server.Jobs
 {
@@ -55,35 +57,48 @@ namespace MyApp.Server.Jobs
         {
             try
             {
-                var matchesCollection = database.GetCollection<Match>("matches");
+                logger.LogInformation("Starting instance and match invalidation job...");
 
-                logger.LogInformation("Starting match invalidation job...");
+                var matchInstanceCollection = new MatchInstanceCollection(database, LoggerFactory.Create(builder => builder.AddConsole()).CreateLogger<MatchInstanceCollection>());
+                var matchCollection = new MatchCollection(database, LoggerFactory.Create(builder => builder.AddConsole()).CreateLogger<MatchCollection>());
 
-                // First, count total matches and valid matches for debugging
-                var totalMatches = await matchesCollection.CountDocumentsAsync(Builders<Match>.Filter.Empty);
-                var validMatchesFilter = Builders<Match>.Filter.Eq(m => m.IsValid, true);
-                var validMatchesCount = await matchesCollection.CountDocumentsAsync(validMatchesFilter);
+                // First, get all valid instances to know which matches to invalidate
+                var allInstances = await database.GetCollection<MatchInstance>("matchInstances")
+                    .Find(Builders<MatchInstance>.Filter.Eq(i => i.IsValid, true))
+                    .ToListAsync();
 
-                logger.LogInformation("Found {TotalMatches} total matches, {ValidMatches} are currently valid", 
-                    totalMatches, validMatchesCount);
+                logger.LogInformation("Found {InstanceCount} valid instances", allInstances.Count);
 
-                if (validMatchesCount == 0)
+                if (allInstances.Count == 0)
                 {
-                    logger.LogInformation("No valid matches found to invalidate");
+                    logger.LogInformation("No valid instances found to invalidate");
                     return 0;
                 }
 
-                // Invalidate all valid matches
-                var update = Builders<Match>.Update.Set(m => m.IsValid, false);
-                var result = await matchesCollection.UpdateManyAsync(validMatchesFilter, update);
+                long totalInvalidatedMatches = 0;
 
-                logger.LogInformation("Match invalidation completed. Modified {Count} matches", result.ModifiedCount);
+                // For each instance, invalidate all matches running on it
+                foreach (var instance in allInstances)
+                {
+                    logger.LogInformation("Invalidating matches for instance {InstanceId} at {Url}:{Port}", 
+                        instance.Id, instance.Url, instance.Port);
+
+                    var invalidatedMatches = await matchCollection.InvalidateMatchesByInstanceAsync(instance.Url, instance.Port);
+                    totalInvalidatedMatches += invalidatedMatches;
+                }
+
+                // Then invalidate all instances
+                logger.LogInformation("Invalidating all instances...");
+                var invalidatedInstances = await matchInstanceCollection.InvalidateAllInstancesAsync();
+
+                logger.LogInformation("Invalidation completed. Invalidated {InstanceCount} instances and {MatchCount} matches", 
+                    invalidatedInstances, totalInvalidatedMatches);
                 
                 return 0;
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Failed to invalidate matches");
+                logger.LogError(ex, "Failed to invalidate instances and matches");
                 return 1;
             }
         }

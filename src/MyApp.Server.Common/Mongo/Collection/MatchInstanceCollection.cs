@@ -41,7 +41,10 @@ namespace Server.Mongo.Collection
 
         public async Task<MatchInstance?> TryAllocateInstanceAsync(int capacity, int requiredSlots)
         {
-            var filter = Builders<MatchInstance>.Filter.Lte(i => i.PlayerCount, capacity - requiredSlots);
+            var filter = Builders<MatchInstance>.Filter.And(
+                Builders<MatchInstance>.Filter.Lte(i => i.PlayerCount, capacity - requiredSlots),
+                Builders<MatchInstance>.Filter.Eq(i => i.IsValid, true)
+            );
             var update = Builders<MatchInstance>.Update.Inc(i => i.PlayerCount, requiredSlots);
             var options = new FindOneAndUpdateOptions<MatchInstance> { ReturnDocument = ReturnDocument.After };
 
@@ -65,7 +68,8 @@ namespace Server.Mongo.Collection
                     Url = url,
                     Port = port,
                     PlayerCount = 0,
-                    CreatedAt = DateTime.UtcNow
+                    CreatedAt = DateTime.UtcNow,
+                    IsValid = true
                 };
                 await _collection.InsertOneAsync(instanceData);
                 return instanceData;
@@ -74,6 +78,44 @@ namespace Server.Mongo.Collection
             {
                 _logger.LogError(ex, "Failed to create instance document");
                 throw new DatabaseOperationException("Failed to create instance document", ex);
+            }
+        }
+
+        public async Task<long> InvalidateAllInstancesAsync()
+        {
+            try
+            {
+                var filter = Builders<MatchInstance>.Filter.Eq(i => i.IsValid, true);
+                var update = Builders<MatchInstance>.Update.Set(i => i.IsValid, false);
+
+                var result = await _collection.UpdateManyAsync(filter, update);
+                
+                _logger.LogInformation("Invalidated {Count} instances", result.ModifiedCount);
+                
+                return result.ModifiedCount;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error invalidating all instances");
+                throw new DatabaseOperationException("Failed to invalidate all instances", ex);
+            }
+        }
+
+        public async Task<List<MatchInstance>> GetInstancesByUrlAndPortAsync(string url, int port)
+        {
+            try
+            {
+                var filter = Builders<MatchInstance>.Filter.And(
+                    Builders<MatchInstance>.Filter.Eq(i => i.Url, url),
+                    Builders<MatchInstance>.Filter.Eq(i => i.Port, port)
+                );
+                
+                return await _collection.Find(filter).ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error getting instances by URL and port: {Url}:{Port}", url, port);
+                throw new DatabaseOperationException($"Failed to get instances for {url}:{port}", ex);
             }
         }
     }

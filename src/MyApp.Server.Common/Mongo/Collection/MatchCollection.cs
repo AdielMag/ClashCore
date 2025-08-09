@@ -325,5 +325,29 @@ namespace Common.Mongo.Collection
                 throw new DatabaseOperationException("Failed to invalidate active matches", ex);
             }
         }
+
+        public async Task<long> InvalidateMatchesByInstanceAsync(string url, int port)
+        {
+            try
+            {
+                var filter = Builders<Match>.Filter.And(
+                    Builders<Match>.Filter.Eq(m => m.Url, url),
+                    Builders<Match>.Filter.Eq(m => m.Port, port),
+                    Builders<Match>.Filter.Eq(m => m.IsValid, true)
+                );
+                var update = Builders<Match>.Update.Set(m => m.IsValid, false);
+
+                var result = await _collection.UpdateManyAsync(filter, update);
+
+                _logger.LogInformation("Invalidated {Count} matches for instance {Url}:{Port}", result.ModifiedCount, url, port);
+
+                return result.ModifiedCount;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error invalidating matches for instance {Url}:{Port}", url, port);
+                throw new DatabaseOperationException($"Failed to invalidate matches for instance {url}:{port}", ex);
+            }
+        }
     }
 } 

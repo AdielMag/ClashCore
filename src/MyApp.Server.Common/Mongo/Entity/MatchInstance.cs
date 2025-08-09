@@ -14,5 +14,6 @@ namespace Server.Mongo.Entity
         public int Port { get; set; }
         public int PlayerCount { get; set; }
         public DateTime CreatedAt { get; set; }
+        public bool IsValid { get; set; } = true;
     }
 }
